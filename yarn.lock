@@ -2205,16 +2205,14 @@ cache-base@^1.0.1:
     union-value "^1.0.0"
     unset-value "^1.0.0"
 
-caip-api@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/caip-api/-/caip-api-1.0.0.tgz#022de653ccd5b9bcd79e7b38d965f0130c836b04"
-  integrity sha512-L4saBVYiJKrlJATYzNqua14HGeMyN1zK3tYYvIGLfcLhJDoWRsbuGnKly7OJMZ9rzEv7I04ksFJ54plXR00few==
+caip-api@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/caip-api/-/caip-api-1.1.1.tgz#d41397e58917acda4765fd32dc33f53918e624b6"
+  integrity sha512-gjAHW7KWzBIr2KXSD0twaG0bcaHYbSfrB3dBfiFHS4nnJctTEK988knI5G2Ln1jsCusdoTuSptfCWIJ0RYhijQ==
   dependencies:
     axios "^0.21.0"
     caip "^0.9.2"
-    mnemonic-keyring "^1.1.0"
     rpc-json-auth "^0.2.1"
-    rpc-json-signer "^1.0.0"
     rpc-json-utils "^1.1.4"
 
 caip@^0.9.2:
