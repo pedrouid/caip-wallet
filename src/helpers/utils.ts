@@ -1,5 +1,3 @@
-import Store from '@pedrouid/iso-store';
-import Keyring from 'mnemonic-keyring';
 import { ChainID } from 'caip';
 import { getChainConfig } from 'caip-api';
 import { JsonRpcAuthConfig } from '@json-rpc-tools/utils';
