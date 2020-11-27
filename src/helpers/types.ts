@@ -1,5 +1,5 @@
-import { IJsonRpcSigner } from 'rpc-json-signer';
-import { IJsonRpcAuthenticator } from 'rpc-json-auth';
+import { IJsonRpcSigner } from '@json-rpc-tools/signer';
+import { IJsonRpcAuthenticator } from '@json-rpc-tools/auth';
 
 export type ChainSigner = IJsonRpcSigner;
 
