@@ -1007,45 +1007,38 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
-"@json-rpc-tools/auth@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/auth/-/auth-1.0.0.tgz#571142e41bdf0740bdf1c91a2632a5877a62e4b3"
-  integrity sha512-NAm/OS2hAiRJUdvSvz6q4eQV7LPLsZ13kmL0hF6mi7c3rNVZ5X5CuWihU0EJJyDguVCAe+x9dRqxuqK9y3xRUw==
+"@json-rpc-tools/auth@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/auth/-/auth-1.1.2.tgz#d7be175da2968a46374de216ab43cf883210d277"
+  integrity sha512-CimnyVfQzBrQyqNsQk9deaAkME2sqs0clRAuWkvhxivWzAM1QcXG0ysCNkRDz0W0bkcLfg5qvBepFKvSO1z49w==
   dependencies:
-    "@json-rpc-tools/signer" "^1.0.0"
-    "@json-rpc-tools/types" "^1.0.0"
-    "@json-rpc-tools/utils" "^1.0.0"
+    "@json-rpc-tools/provider" "^1.1.2"
+    "@json-rpc-tools/types" "^1.1.2"
+    "@json-rpc-tools/utils" "^1.1.2"
     "@pedrouid/iso-store" "^1.0.4"
     jsonschema "^1.4.0"
 
-"@json-rpc-tools/provider@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/provider/-/provider-1.0.0.tgz#3eccb5659836ca504d3582041e83ac0b7183f5ac"
-  integrity sha512-57BIodyqCa+yKPvjH/CgGD5TawTwwmMAHaQCZYx0233MwGT5JHm5bXTkLjIQhzBZOremN90x4B+1pQ+BUK0S5g==
+"@json-rpc-tools/provider@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/provider/-/provider-1.1.2.tgz#8bcca7af1db80a234460e7aee787b8714cd6b365"
+  integrity sha512-fgfjW3DGtwstgDdhvl5+J9tHPOLBTKcl4OSM6672UPFYzL3mepsyt6DLuDVU5m7/Rm/2DldZn32mmEjsdj79+Q==
   dependencies:
-    "@json-rpc-tools/utils" "^1.0.0"
+    "@json-rpc-tools/utils" "^1.1.2"
     axios "^0.21.0"
+    safe-json-utils "^1.1.1"
+    ws "^7.4.0"
 
-"@json-rpc-tools/signer@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/signer/-/signer-1.0.0.tgz#2d4900d5f2821449f10cc65c5c82daf779516b6e"
-  integrity sha512-7lMkxDC4N5f/r1Z0AUSMrYSoF6CbLpDM5SJW5//7sfXtWqSKXJRxeplOqhct6WWCpEy0Wpu54Emf9hPHt9YqJQ==
+"@json-rpc-tools/types@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/types/-/types-1.1.2.tgz#4013b707fab1bd1f043ed171db15f85af0a32829"
+  integrity sha512-Vxj2WZH/GR9ouscjNjw+ipJJzZwd9R2KOMDQMl9AT3gRFrk7NEcUdQa999Ch1j9GUedAHUUk6OoIBsUOPnosKg==
+
+"@json-rpc-tools/utils@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/utils/-/utils-1.1.2.tgz#7fa0cc67c1caaa99a32d730fff64b2ebe3ebaced"
+  integrity sha512-gSvzJybRSK5kd1F4YdSoihofiLmkCfBoab407HYNjjEWhcbmZ0BrbPtPAUGhe9OG8hFaxs27zhD78I8PoaDTvQ==
   dependencies:
-    "@json-rpc-tools/provider" "^1.0.0"
-    "@json-rpc-tools/types" "^1.0.0"
-    "@json-rpc-tools/utils" "^1.0.0"
-
-"@json-rpc-tools/types@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/types/-/types-1.0.0.tgz#366c44132c60afd1a5daac7f673bff82cbe61c63"
-  integrity sha512-ytjmL1/NJvgCijYGTOn5/8C/R1gqxxmAzIec/nUkAwGPFk5eSISd5vhfYKa8k04hacu+6cfeo1fsZyCmIvDaHg==
-
-"@json-rpc-tools/utils@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/utils/-/utils-1.0.0.tgz#23cb25d7a870abfa45d2b044418335ed53260d16"
-  integrity sha512-QlzXHsEZLYG6docpMA2UIr087Y6A6uX4Dy7aHmpU2hQHjPptTq1bT2IBnW9P885biV1ocF7hPO0feUzytOyB4Q==
-  dependencies:
-    "@json-rpc-tools/types" "^1.0.0"
+    "@json-rpc-tools/types" "^1.1.2"
 
 "@pedrouid/iso-store@^1.0.4":
   version "1.0.5"
@@ -7785,6 +7778,11 @@ ws@^5.2.0:
   integrity sha512-jaHFD6PFv6UgoIVda6qZllptQsMlDEJkTQcybzzXDYM1XO9Y8em691FGMPmM46WGyLU4z9KMgQN+qrux/nhlHA==
   dependencies:
     async-limiter "~1.0.0"
+
+ws@^7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.0.tgz#a5dd76a24197940d4a8bb9e0e152bb4503764da7"
+  integrity sha512-kyFwXuV/5ymf+IXhS6f0+eAFvydbaBW3zjpT6hUdAh/hbVjTIB5EHBGi0bPoCLSK2wcuz3BrEkB9LrYv1Nm4NQ==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
