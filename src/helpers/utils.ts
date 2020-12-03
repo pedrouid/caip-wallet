@@ -1,45 +1,35 @@
 import { ChainID } from 'caip';
-import { getChainConfig } from 'caip-api';
-import { JsonRpcAuthConfig } from '@json-rpc-tools/utils';
-
-import * as CAIPWallet from '../';
+import { getChainConfig, getChainJsonRpc } from 'caip-api';
 import {
-  AuthenticatorMap,
-  ChainAuthenticator,
-  ChainSigner,
-  GenerateAuthMapOptions,
-} from './types';
-import { getChainJsonRpc } from 'caip-api';
+  BlockchainAuthenticator,
+  BlockchainProvider,
+  SignerConnection,
+} from '@json-rpc-tools/blockchain';
+import { JsonRpcProvider } from '@json-rpc-tools/provider';
 
-export function getChainProperty<T>(chainId: string, property: string): T {
+import { AuthenticatorMap, GenerateAuthMapOptions } from './types';
+
+import * as blockchain from '../';
+import { ISigner } from '../shared';
+
+export function getChainSigner(chainId: string): ISigner {
   const { namespace } = ChainID.parse(chainId);
-  const config = CAIPWallet[property][namespace];
+  const signer = blockchain.signer[namespace];
 
-  if (!config) {
-    throw new Error(`No matching ${property} for chainId: ${chainId}`);
+  if (!signer) {
+    throw new Error(`No matching signer for chainId: ${chainId}`);
   }
-  return config;
+  return signer;
 }
 
-export function getChainSigner(chainId: string): ChainSigner {
-  return getChainProperty<ChainSigner>(chainId, 'signer');
-}
+export function getChainMiddleware(chainId: string): any {
+  const { namespace } = ChainID.parse(chainId);
+  const middleware = blockchain.middleware[namespace];
 
-export function getChainAuthenticator(chainId: string): ChainAuthenticator {
-  return getChainProperty<ChainAuthenticator>(chainId, 'authenticator');
-}
-
-export function generateAuthenticatorConfig(
-  chainId: string
-): JsonRpcAuthConfig {
-  const jsonrpc = getChainJsonRpc(chainId);
-  return {
-    chainId,
-    accounts: {
-      method: '',
-    },
-    ...jsonrpc,
-  };
+  if (!middleware) {
+    throw new Error(`No matching middleware for chainId: ${chainId}`);
+  }
+  return middleware;
 }
 
 export function generateAuthMap(
@@ -47,21 +37,32 @@ export function generateAuthMap(
 ): AuthenticatorMap {
   const map: AuthenticatorMap = {};
   opts.chainIds.forEach((chainId: string) => {
-    const config = getChainConfig(chainId);
-
-    const Auth = getChainAuthenticator(chainId);
-    const Signer = getChainSigner(chainId);
-    const keyPair = opts.keyring.getKeyPair(config.derivationPath);
-    // TODO: Fix types for Signer
-    // @ts-ignore
-    const signer = new Signer(config.rpcUrl, keyPair);
-    // TODO: Fix types for Auth
-    // @ts-ignore
-    const auth = new Auth(
-      generateAuthenticatorConfig(chainId),
-      signer,
-      opts.store
+    const { rpcUrl, derivationPath } = getChainConfig(chainId);
+    const keyPair = opts.keyring.getKeyPair(derivationPath);
+    const Signer = getChainSigner(chainId) as any;
+    const Middleware = getChainMiddleware(chainId) as any;
+    const http = new JsonRpcProvider(rpcUrl);
+    const connection = new SignerConnection(
+      new Signer(keyPair),
+      new Middleware(http)
     );
+    const { schemas } = getChainJsonRpc(chainId);
+    const provider = new BlockchainProvider({
+      providers: {
+        http,
+        signer: new JsonRpcProvider(connection),
+      },
+      routes: {
+        http: ['*'],
+        signer: Object.keys(schemas),
+      },
+      state: {
+        chainId: '',
+        accounts: '',
+      },
+      schemas,
+    });
+    const auth = new BlockchainAuthenticator(provider, opts.store);
     map[chainId] = auth;
   });
   return map;

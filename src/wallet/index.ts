@@ -58,11 +58,18 @@ export class CaipWallet implements IEvents {
     return this.auth[chainId].approve(request);
   }
 
-  public async resolve(
+  public async reject(
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.auth[chainId].resolve(request);
+    return this.auth[chainId].reject(request);
+  }
+
+  public async request(
+    request: JsonRpcRequest,
+    chainId: string
+  ): Promise<JsonRpcResponse> {
+    return this.auth[chainId].request(request);
   }
 }
 

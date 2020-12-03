@@ -2,7 +2,6 @@ import Wallet from './wallet';
 
 export * from 'caip-api';
 
-export * from './auth';
 export * from './helpers';
 export * from './signers';
 export * from './wallet';

@@ -63,11 +63,11 @@
   },
   "dependencies": {
     "@pedrouid/iso-store": "^1.0.5",
-    "@json-rpc-tools/auth": "^1.1.3",
-    "@json-rpc-tools/provider": "^1.1.3",
-    "@json-rpc-tools/utils": "^1.1.3",
+    "@json-rpc-tools/blockchain": "^1.2.2",
+    "@json-rpc-tools/provider": "^1.2.2",
+    "@json-rpc-tools/utils": "^1.2.2",
     "caip": "^0.9.2",
-    "caip-api": "^1.2.1",
+    "caip-api": "^1.2.2",
     "mnemonic-keyring": "^1.1.0"
   }
 }
