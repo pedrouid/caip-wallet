@@ -1,5 +1,13 @@
+import Wallet from '../src';
+
+const TEST_MNE;
+
 describe('caip-wallet', () => {
-  it('needs tests', async () => {
-    // needs tests
+  let wallet: Wallet;
+  beforeAll(async () => {
+    wallet = await Wallet.init({ chainIds: ['eip155:1'] });
+  });
+  it('init', async () => {
+    expect(wallet).toBeTruthy();
   });
 });

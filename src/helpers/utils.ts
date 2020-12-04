@@ -34,7 +34,7 @@ export function generateChainAuthenticators(
     const config = getChainConfig(chainId);
     const keyPair = opts.keyring.getKeyPair(config.derivationPath);
     const SignerConnection = getChainSigner(chainId);
-    const http = new JsonRpcProvider(config.rpcUrl);
+    const http = new JsonRpcProvider(`https://${config.rpcUrl}`);
     const connection = new SignerConnection({ keyPair, provider: http });
     const { state, schemas } = getChainJsonRpc(chainId);
     const provider = new BlockchainProvider({
