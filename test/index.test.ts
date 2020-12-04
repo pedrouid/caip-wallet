@@ -1,7 +1,5 @@
 import Wallet from '../src';
 
-const TEST_MNE;
-
 describe('caip-wallet', () => {
   let wallet: Wallet;
   beforeAll(async () => {
