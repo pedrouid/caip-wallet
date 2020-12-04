@@ -36,7 +36,6 @@ export function generateChainAuthenticators(
     const SignerConnection = getChainSigner(chainId);
     const http = new JsonRpcProvider(config.rpcUrl);
     const connection = new SignerConnection({ keyPair, provider: http });
-    // TODO: make caip-api jsonrpc schemas required
     const { state, schemas } = getChainJsonRpc(chainId);
     const provider = new BlockchainProvider({
       providers: {
@@ -44,7 +43,6 @@ export function generateChainAuthenticators(
         signer: new JsonRpcProvider(connection),
       },
       routes: {
-        // TODO: add wildcard support for jsonrpc routes
         http: ['*'],
         signer: Object.keys(schemas || []),
       },
