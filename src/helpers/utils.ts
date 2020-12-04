@@ -3,16 +3,20 @@ import { getChainConfig, getChainJsonRpc } from 'caip-api';
 import {
   BlockchainAuthenticator,
   BlockchainProvider,
-  SignerConnection,
 } from '@json-rpc-tools/blockchain';
 import { JsonRpcProvider } from '@json-rpc-tools/provider';
 
-import { AuthenticatorMap, GenerateAuthMapOptions } from './types';
+import {
+  ChainAuthenticatorsMap,
+  GenerateChainAuthenticatorsOptions,
+} from './types';
+import { BlockchainSignerConnection } from './signer';
 
 import * as blockchain from '../';
-import { ISigner } from '../shared';
 
-export function getChainSigner(chainId: string): ISigner {
+export function getChainSigner(
+  chainId: string
+): typeof BlockchainSignerConnection {
   const { namespace } = ChainID.parse(chainId);
   const signer = blockchain.signer[namespace];
 
@@ -22,44 +26,29 @@ export function getChainSigner(chainId: string): ISigner {
   return signer;
 }
 
-export function getChainMiddleware(chainId: string): any {
-  const { namespace } = ChainID.parse(chainId);
-  const middleware = blockchain.middleware[namespace];
-
-  if (!middleware) {
-    throw new Error(`No matching middleware for chainId: ${chainId}`);
-  }
-  return middleware;
-}
-
-export function generateAuthMap(
-  opts: GenerateAuthMapOptions
-): AuthenticatorMap {
-  const map: AuthenticatorMap = {};
+export function generateChainAuthenticators(
+  opts: GenerateChainAuthenticatorsOptions
+): ChainAuthenticatorsMap {
+  const map: ChainAuthenticatorsMap = {};
   opts.chainIds.forEach((chainId: string) => {
-    const { rpcUrl, derivationPath } = getChainConfig(chainId);
-    const keyPair = opts.keyring.getKeyPair(derivationPath);
-    const Signer = getChainSigner(chainId) as any;
-    const Middleware = getChainMiddleware(chainId) as any;
-    const http = new JsonRpcProvider(rpcUrl);
-    const connection = new SignerConnection(
-      new Signer(keyPair),
-      new Middleware(http)
-    );
-    const { schemas } = getChainJsonRpc(chainId);
+    const config = getChainConfig(chainId);
+    const keyPair = opts.keyring.getKeyPair(config.derivationPath);
+    const SignerConnection = getChainSigner(chainId);
+    const http = new JsonRpcProvider(config.rpcUrl);
+    const connection = new SignerConnection({ keyPair, provider: http });
+    // TODO: make caip-api jsonrpc schemas required
+    const { state, schemas } = getChainJsonRpc(chainId);
     const provider = new BlockchainProvider({
       providers: {
         http,
         signer: new JsonRpcProvider(connection),
       },
       routes: {
+        // TODO: add wildcard support for jsonrpc routes
         http: ['*'],
-        signer: Object.keys(schemas),
+        signer: Object.keys(schemas || []),
       },
-      state: {
-        chainId: '',
-        accounts: '',
-      },
+      state,
       schemas,
     });
     const auth = new BlockchainAuthenticator(provider, opts.store);

@@ -1,3 +1,1 @@
-export class CosmosSigner {}
-
-export class CosmosMiddleware {}
+export class CosmosSignerConnection {}

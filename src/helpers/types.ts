@@ -6,19 +6,21 @@ import {
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
 
-export interface AuthenticatorMap {
+export interface ChainAuthenticatorsMap {
   [chainId: string]: IBlockchainAuthenticator;
 }
 
-export interface GenerateAuthMapOptions {
-  store: Store;
-  keyring: Keyring;
+export interface BaseCaipWalletOptions {
   chainIds: string[];
+  store?: Store;
 }
 
-export interface CaipWalletOptions {
-  store: Store;
-  chainIds: string[];
+export interface GenerateChainAuthenticatorsOptions
+  extends BaseCaipWalletOptions {
+  keyring: Keyring;
+}
+
+export interface CaipWalletOptions extends BaseCaipWalletOptions {
   mnemonic?: string;
 }
 

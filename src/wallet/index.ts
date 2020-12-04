@@ -8,9 +8,9 @@ import { EventEmitter } from 'events';
 import Keyring from 'mnemonic-keyring';
 
 import {
-  AuthenticatorMap,
+  ChainAuthenticatorsMap,
   CaipWalletOptions,
-  generateAuthMap,
+  generateChainAuthenticators,
 } from '../helpers';
 
 export class CaipWallet implements IEvents {
@@ -18,21 +18,21 @@ export class CaipWallet implements IEvents {
 
   public static async init(opts: CaipWalletOptions): Promise<CaipWallet> {
     const keyring = await Keyring.init({
-      store: opts.store,
       mnemonic: opts.mnemonic,
+      store: opts.store,
     });
-    const auth = generateAuthMap({ ...opts, keyring });
-    return new CaipWallet(opts.store, keyring, auth);
+    const auth = generateChainAuthenticators({ ...opts, keyring });
+    return new CaipWallet(keyring, auth, opts.store);
   }
 
   constructor(
-    public store: Store,
     public keyring: Keyring,
-    public auth: AuthenticatorMap
+    public chains: ChainAuthenticatorsMap,
+    public store?: Store
   ) {
-    this.store = store;
     this.keyring = keyring;
-    this.auth = auth;
+    this.chains = chains;
+    this.store = store;
   }
 
   public on(event: string, listener: any): void {
@@ -48,28 +48,28 @@ export class CaipWallet implements IEvents {
   }
 
   public async getAccounts(chainId: string): Promise<string[]> {
-    return this.auth[chainId].getAccounts();
+    return this.chains[chainId].getAccounts();
   }
 
   public async approve(
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.auth[chainId].approve(request);
+    return this.chains[chainId].approve(request);
   }
 
   public async reject(
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.auth[chainId].reject(request);
+    return this.chains[chainId].reject(request);
   }
 
   public async request(
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.auth[chainId].request(request);
+    return this.chains[chainId].request(request);
   }
 }
 

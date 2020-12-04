@@ -1,3 +1,1 @@
-export class PolkadotSigner {}
-
-export class PolkadotMiddleware {}
+export class PolkadotSignerConnection {}
