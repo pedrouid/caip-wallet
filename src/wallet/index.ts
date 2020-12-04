@@ -3,7 +3,6 @@ import {
   JsonRpcRequest,
   JsonRpcResponse,
 } from '@json-rpc-tools/utils';
-import Store from '@pedrouid/iso-store';
 import { EventEmitter } from 'events';
 import Keyring from 'mnemonic-keyring';
 
@@ -17,22 +16,13 @@ export class CaipWallet implements IEvents {
   public events = new EventEmitter();
 
   public static async init(opts: CaipWalletOptions): Promise<CaipWallet> {
-    const keyring = await Keyring.init({
-      mnemonic: opts.mnemonic,
-      store: opts.store,
-    });
-    const auth = generateChainAuthenticators({ ...opts, keyring });
-    return new CaipWallet(keyring, auth, opts.store);
+    const keyring = await Keyring.init({ ...opts });
+    const chains = generateChainAuthenticators({ ...opts, keyring });
+    return new CaipWallet(chains);
   }
 
-  constructor(
-    public keyring: Keyring,
-    public chains: ChainAuthenticatorsMap,
-    public store?: Store
-  ) {
-    this.keyring = keyring;
+  constructor(public chains: ChainAuthenticatorsMap) {
     this.chains = chains;
-    this.store = store;
   }
 
   public on(event: string, listener: any): void {
