@@ -61,6 +61,9 @@ export class EIP155SignerConnection implements ISignerConnection {
     }
     let result: any;
     switch (request.method) {
+      case 'eth_accounts':
+        result = [await this.wallet.getAddress()];
+        break;
       case 'eth_sendTransaction':
         result = await this.wallet.sendTransaction(request.params[0]);
         break;

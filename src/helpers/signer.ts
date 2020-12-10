@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { ChainID } from 'caip';
 import { KeyPair } from 'mnemonic-keyring';
 import {
   formatJsonRpcError,
@@ -12,6 +13,8 @@ import {
   ISignerConnection,
   SignerConnectionOptions,
 } from '@json-rpc-tools/blockchain';
+
+import { signers } from '../signers';
 
 export class BlockchainSignerConnection implements ISignerConnection {
   public events = new EventEmitter();
@@ -71,4 +74,27 @@ export class BlockchainSignerConnection implements ISignerConnection {
   private onClose() {
     this.events.emit('close');
   }
+}
+
+export function getChainSignerConnection(
+  chainId: string
+): typeof BlockchainSignerConnection {
+  const { namespace } = ChainID.parse(chainId);
+  const signer = signers[namespace];
+
+  if (!signer) {
+    throw new Error(`No matching signer for chainId: ${chainId}`);
+  }
+  return signer;
+}
+
+export function generateChainSigner(
+  chainId: string,
+  keyPair: KeyPair,
+  provider: JsonRpcProvider
+): JsonRpcProvider {
+  const SignerConnection = getChainSignerConnection(chainId);
+  const connection = new SignerConnection({ keyPair, provider });
+  const signer = new JsonRpcProvider(connection);
+  return signer;
 }

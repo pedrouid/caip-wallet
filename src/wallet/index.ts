@@ -9,20 +9,25 @@ import Keyring from 'mnemonic-keyring';
 import {
   ChainAuthenticatorsMap,
   CaipWalletOptions,
-  generateChainAuthenticators,
+  generateChainAuthenticator,
 } from '../helpers';
 
 export class CaipWallet implements IEvents {
   public events = new EventEmitter();
 
   public static async init(opts: CaipWalletOptions): Promise<CaipWallet> {
+    const { chainIds, store } = opts;
     const keyring = await Keyring.init({ ...opts });
-    const chains = generateChainAuthenticators({ ...opts, keyring });
-    return new CaipWallet(chains);
+    const chains: ChainAuthenticatorsMap = {};
+    chainIds.forEach((chainId: string) => {
+      chains[chainId] = generateChainAuthenticator(chainId, keyring, store);
+    });
+    return new CaipWallet(chains, keyring.mnemonic);
   }
 
-  constructor(public chains: ChainAuthenticatorsMap) {
+  constructor(public chains: ChainAuthenticatorsMap, public mnemonic: string) {
     this.chains = chains;
+    this.mnemonic = mnemonic;
   }
 
   public on(event: string, listener: any): void {
@@ -37,8 +42,14 @@ export class CaipWallet implements IEvents {
     this.events.off(event, listener);
   }
 
-  public async getAccounts(chainId: string): Promise<string[]> {
-    return this.chains[chainId].getAccounts();
+  public async getChainIds(): Promise<string[]> {
+    return Object.keys(this.chains);
+  }
+
+  public async getAccountIds(chainId: string): Promise<string[]> {
+    return (await this.chains[chainId].getAccounts()).map(
+      address => `${address}@${chainId}`
+    );
   }
 
   public async approve(
