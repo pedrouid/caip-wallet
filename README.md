@@ -34,7 +34,7 @@ const request = {
     '0xa89Df33a6f26c29ea23A9Ff582E865C03132b140
   ]
 }
-const response = await wallet.resolve(request)
+const response = await wallet.resolve(request, 'eip155:1')
 // (resolved automatically unless required user approval for authentication)
 ```
 
