@@ -1,6 +1,5 @@
 import {
   formatJsonRpcRequest,
-  IEvents,
   isJsonRpcError,
   JsonRpcRequest,
   JsonRpcResponse,
