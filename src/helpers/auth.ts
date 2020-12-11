@@ -1,38 +1,38 @@
-import Keyring from 'mnemonic-keyring';
 import Store from '@pedrouid/iso-store';
-import { getChainConfig, getChainJsonRpc } from 'caip-api';
+import { KeyPair } from 'mnemonic-keyring';
+import { ChainJsonRpc } from 'caip-api';
 import {
   BlockchainAuthenticator,
   BlockchainProvider,
 } from '@json-rpc-tools/blockchain';
-import { JsonRpcProvider } from '@json-rpc-tools/provider';
-import { generateChainSigner } from './signer';
 
-export function generateChainProvider(
-  chainId: string,
-  signer: JsonRpcProvider,
-  http: JsonRpcProvider
-): BlockchainProvider {
-  const { routes, state, schemas } = getChainJsonRpc(chainId);
-  const provider = new BlockchainProvider({
-    providers: { http, signer },
-    routes,
-    state,
-    schemas,
-  });
-  return provider;
-}
+import { getChainSignerConnection } from './signer';
 
-export function generateChainAuthenticator(
+export async function generateChainAuthenticator(
   chainId: string,
-  keyring: Keyring,
+  rpcUrl: string,
+  keyPair: KeyPair,
+  jsonrpc: ChainJsonRpc,
   store?: Store
-): BlockchainAuthenticator {
-  const config = getChainConfig(chainId);
-  const keyPair = keyring.getKeyPair(config.derivationPath);
-  const http = new JsonRpcProvider(`https://${config.rpcUrl}`);
-  const signer = generateChainSigner(chainId, keyPair, http);
-  const provider = generateChainProvider(chainId, signer, http);
-  const auth = new BlockchainAuthenticator(provider, store);
+): Promise<BlockchainAuthenticator> {
+  const SignerConnection = getChainSignerConnection(chainId);
+  const provider = new BlockchainProvider(rpcUrl, {
+    chainId,
+    routes: jsonrpc.routes.http,
+    signer: {
+      routes: jsonrpc.routes.signer,
+      connection: new SignerConnection({ keyPair, rpcUrl }),
+    },
+    validator: {
+      schemas: jsonrpc.schemas,
+    },
+  });
+  await provider.connect();
+  const auth = new BlockchainAuthenticator({
+    provider,
+    requiredApproval: jsonrpc.wallet.auth,
+    store,
+  });
+  await auth.init();
   return auth;
 }

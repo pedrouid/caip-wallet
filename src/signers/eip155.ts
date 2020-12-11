@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { providers, utils, Wallet } from 'ethers';
+import { KeyPair } from 'mnemonic-keyring';
 import {
   formatJsonRpcError,
   formatJsonRpcResult,
@@ -8,30 +9,29 @@ import {
   JsonRpcResponse,
 } from '@json-rpc-tools/utils';
 import { JsonRpcProvider } from '@json-rpc-tools/provider';
-import {
-  ISignerConnection,
-  SignerConnectionOptions,
-} from '@json-rpc-tools/blockchain';
 
-export class EIP155SignerConnection implements ISignerConnection {
+import {
+  IBlockchainSignerConnection,
+  SignerConnectionOptions,
+} from '../helpers';
+
+export class EIP155SignerConnection implements IBlockchainSignerConnection {
   public events = new EventEmitter();
 
-  public wallet: Wallet;
+  public url: string;
+  public keyPair: KeyPair;
   public provider: IJsonRpcProvider;
 
-  constructor(opts: Required<SignerConnectionOptions>) {
-    this.provider =
-      typeof opts.provider === 'string'
-        ? new JsonRpcProvider(opts.provider)
-        : opts.provider;
-    this.wallet = new Wallet(
-      opts.keyPair.privateKey,
-      new providers.Web3Provider(this.provider as any)
-    );
+  public wallet: Wallet | undefined;
+
+  constructor(opts: SignerConnectionOptions) {
+    this.url = opts.rpcUrl;
+    this.keyPair = opts.keyPair;
+    this.provider = new JsonRpcProvider(opts.rpcUrl);
   }
 
   get connected(): boolean {
-    return true;
+    return typeof this.wallet !== 'undefined';
   }
 
   public on(event: string, listener: any): void {
@@ -46,8 +46,8 @@ export class EIP155SignerConnection implements ISignerConnection {
     this.events.off(event, listener);
   }
 
-  public async open(): Promise<void> {
-    this.onOpen();
+  public async open(url: string = this.url): Promise<void> {
+    this.wallet = await this.register(url);
   }
 
   public async close(): Promise<void> {
@@ -55,6 +55,9 @@ export class EIP155SignerConnection implements ISignerConnection {
   }
 
   public async send(request: JsonRpcRequest): Promise<void> {
+    if (typeof this.wallet === 'undefined') {
+      this.wallet = await this.register();
+    }
     if (request.method.startsWith('eth_signTypedData')) {
       // assume latest spec is being and replace version identifiers
       request.method = 'eth_signTypedData';
@@ -71,7 +74,7 @@ export class EIP155SignerConnection implements ISignerConnection {
         result = await this.wallet.signTransaction(request.params[0]);
         break;
       case 'eth_sign':
-        result = this.legacySignMessage(request);
+        result = await this.legacySignMessage(request);
         break;
       case 'eth_signTypedData':
         result = await this.wallet._signTypedData(
@@ -96,12 +99,16 @@ export class EIP155SignerConnection implements ISignerConnection {
     } catch (e) {
       response = formatJsonRpcError(request.id, e.message);
     }
+
     this.events.emit('payload', response);
   }
 
   // ---------- Protected ----------------------------------------------- //
 
-  protected legacySignMessage(request: JsonRpcRequest): string {
+  protected async legacySignMessage(request: JsonRpcRequest): Promise<string> {
+    if (typeof this.wallet === 'undefined') {
+      this.wallet = await this.register();
+    }
     const signingKey = new utils.SigningKey(this.wallet.privateKey);
     const sigParams = signingKey.signDigest(utils.arrayify(request.params[1]));
     const result = utils.joinSignature(sigParams);
@@ -110,7 +117,18 @@ export class EIP155SignerConnection implements ISignerConnection {
 
   // ---------- Private ----------------------------------------------- //
 
-  private onOpen() {
+  private async register(url = this.url): Promise<Wallet> {
+    this.url = url;
+    const wallet = new Wallet(
+      this.keyPair.privateKey,
+      new providers.JsonRpcProvider(this.url)
+    );
+    this.onOpen(wallet);
+    return wallet;
+  }
+
+  private onOpen(wallet: Wallet) {
+    this.wallet = wallet;
     this.events.emit('open');
   }
 

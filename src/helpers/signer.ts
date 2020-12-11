@@ -4,30 +4,34 @@ import { KeyPair } from 'mnemonic-keyring';
 import {
   formatJsonRpcError,
   formatJsonRpcResult,
+  IJsonRpcConnection,
   IJsonRpcProvider,
   JsonRpcRequest,
   JsonRpcResponse,
 } from '@json-rpc-tools/utils';
 import { JsonRpcProvider } from '@json-rpc-tools/provider';
-import {
-  ISignerConnection,
-  SignerConnectionOptions,
-} from '@json-rpc-tools/blockchain';
 
 import { signers } from '../signers';
+import { SignerConnectionOptions } from './types';
 
-export class BlockchainSignerConnection implements ISignerConnection {
+export abstract class IBlockchainSignerConnection extends IJsonRpcConnection {
+  public abstract keyPair: KeyPair;
+  public abstract provider: IJsonRpcProvider;
+
+  constructor(opts: SignerConnectionOptions) {
+    super(opts.rpcUrl);
+  }
+}
+
+export class BlockchainSignerConnection implements IBlockchainSignerConnection {
   public events = new EventEmitter();
 
   public keyPair: KeyPair;
   public provider: IJsonRpcProvider;
 
-  constructor(opts: Required<SignerConnectionOptions>) {
+  constructor(opts: SignerConnectionOptions) {
     this.keyPair = opts.keyPair;
-    this.provider =
-      typeof opts.provider === 'string'
-        ? new JsonRpcProvider(opts.provider)
-        : opts.provider;
+    this.provider = new JsonRpcProvider(opts.rpcUrl);
   }
 
   get connected(): boolean {
@@ -65,13 +69,13 @@ export class BlockchainSignerConnection implements ISignerConnection {
     this.events.emit('payload', response);
   }
 
-  // ---------- Private ----------------------------------------------- //
+  // ---------- Protected ----------------------------------------------- //
 
-  private onOpen() {
+  protected onOpen() {
     this.events.emit('open');
   }
 
-  private onClose() {
+  protected onClose() {
     this.events.emit('close');
   }
 }
@@ -85,16 +89,5 @@ export function getChainSignerConnection(
   if (!signer) {
     throw new Error(`No matching signer for chainId: ${chainId}`);
   }
-  return signer;
-}
-
-export function generateChainSigner(
-  chainId: string,
-  keyPair: KeyPair,
-  provider: JsonRpcProvider
-): JsonRpcProvider {
-  const SignerConnection = getChainSignerConnection(chainId);
-  const connection = new SignerConnection({ keyPair, provider });
-  const signer = new JsonRpcProvider(connection);
   return signer;
 }
