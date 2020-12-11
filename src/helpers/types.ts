@@ -1,12 +1,13 @@
 import Store from '@pedrouid/iso-store';
 import Keyring, { KeyPair } from 'mnemonic-keyring';
 import {
+  BlockchainJsonRpcConfig,
   IBlockchainAuthenticator,
   IEvents,
   JsonRpcRequest,
   JsonRpcResponse,
+  JsonRpcSchemas,
 } from '@json-rpc-tools/utils';
-import { ChainJsonRpc } from 'caip-api';
 
 export interface ChainAuthenticatorsMap {
   [chainId: string]: IBlockchainAuthenticator;
@@ -15,6 +16,15 @@ export interface ChainAuthenticatorsMap {
 export interface ChainJsonRpcMap {
   [chainId: string]: ChainJsonRpc;
 }
+
+export interface ChainJsonRpcRoutes extends BlockchainJsonRpcConfig {
+  wallet: {
+    accounts: string;
+    auth: string[];
+  };
+}
+
+export type ChainJsonRpc = ChainJsonRpcRoutes & JsonRpcSchemas;
 
 export interface BaseCaipWalletOptions {
   chainIds: string[];

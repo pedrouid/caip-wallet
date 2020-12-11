@@ -4,7 +4,7 @@ import {
   JsonRpcRequest,
   JsonRpcResponse,
 } from '@json-rpc-tools/utils';
-import { getChainConfig, getChainJsonRpc } from 'caip-api';
+import { getChainConfig, getChainJsonRpcSchemas } from 'caip-api';
 import { EventEmitter } from 'events';
 import Keyring from 'mnemonic-keyring';
 
@@ -15,6 +15,7 @@ import {
   ChainJsonRpcMap,
   CaipWalletConfig,
   ICaipWallet,
+  getChainJsonRpcRoutes,
 } from '../helpers';
 
 export class CaipWallet implements ICaipWallet {
@@ -34,7 +35,10 @@ export class CaipWallet implements ICaipWallet {
         const config = getChainConfig(chainId);
         const keyPair = keyring.getKeyPair(config.derivationPath);
         const rpcUrl = `https://${config.rpcUrl}`;
-        jsonrpc[chainId] = getChainJsonRpc(chainId);
+        jsonrpc[chainId] = {
+          ...getChainJsonRpcRoutes(chainId),
+          ...getChainJsonRpcSchemas(chainId),
+        };
         chains[chainId] = await generateChainAuthenticator(
           chainId,
           rpcUrl,

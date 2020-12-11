@@ -5,17 +5,17 @@ CAIP-compatible Multi-Blockchain Wallet
 ## Quick Start
 
 ```typescript
-import CaipWallet from 'caip-wallet';
+import CaipWallet from "caip-wallet";
 
 // Initiate Wallet with target chains
 const wallet = await CaipWallet.init({
-  chainIds: ['eip155:1'],
+  chainIds: ["eip155:1"],
   mnemonic:
-    'basic guard spider horse civil trumpet into chalk basket month cabbage walk',
+    "basic guard spider horse civil trumpet into chalk basket month cabbage walk",
 });
 
 // Subscribe to pending user approval event
-wallet.on('pending_approval', ({ chainId, request }) => {
+wallet.on("pending_approval", ({ chainId, request }) => {
   // Display Request with ChainID for user approval
   if (userApproved) {
     wallet.approve(request, chainId);
@@ -30,11 +30,11 @@ const request = {
   jsonrpc: "2.0",
   method: "personal_sign",
   params: [
-    toHex('Test Message')
-    '0xa89Df33a6f26c29ea23A9Ff582E865C03132b140
+    toHex("Test Message")
+    "0xa89Df33a6f26c29ea23A9Ff582E865C03132b140"
   ]
 }
-const response = await wallet.resolve(request, 'eip155:1')
+const response = await wallet.resolve(request, chainId)
 // (resolved automatically unless required user approval for authentication)
 ```
 

@@ -1383,13 +1383,6 @@
   resolved "https://registry.yarnpkg.com/@json-rpc-tools/types/-/types-1.5.2.tgz#7e1945113afbfe11eb7eeb7f6f2485d99b2cea20"
   integrity sha512-4/QU+/5thmC3fURNe3DYPyRPENnqT7RBhJ8tyW8wHIayhSq4cDpuPMxYhLx0UcdpNnx4PUSbNJkUJip+662nSA==
 
-"@json-rpc-tools/utils@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/utils/-/utils-1.5.1.tgz#558d274758b6b7b88e6161da0831b2b0e7c91e6d"
-  integrity sha512-uoZ8bo02wCmmDk/7e3XwzDfN1bVh+Ow/JDJ4erILC+qmFyCkhTzXcPzKoNZQM2QGzfuiFZT1l//wLdg9asyETg==
-  dependencies:
-    "@json-rpc-tools/types" "^1.5.1"
-
 "@json-rpc-tools/utils@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@json-rpc-tools/utils/-/utils-1.5.2.tgz#0c9e5a2b48ff18e1d78a528f0d30227dfa2f6fdc"
@@ -2613,12 +2606,12 @@ cache-base@^1.0.1:
     union-value "^1.0.0"
     unset-value "^1.0.0"
 
-caip-api@^1.2.9:
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/caip-api/-/caip-api-1.2.9.tgz#4e7bba91edaa80fbdf6a88045277be4e3025d92b"
-  integrity sha512-gDxSEHpfx1yaotDD2o6JVg/M2idtfgTKaVjHczxXBp3Gz8ECHBoLzDepGKG2HeBG/AGiOJp38yrypuYgbof40A==
+caip-api@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/caip-api/-/caip-api-1.3.1.tgz#8cec1160d2f59fce2d648f187892b30f663c2e0a"
+  integrity sha512-oAcUtScH2TRlcMbjHPu/mawuM9pw8xPP7EZNy1tb2/p4WAqNwN06e7pFBD5T8RarbowfKFFxvd/O+2exKhGZxQ==
   dependencies:
-    "@json-rpc-tools/utils" "^1.5.1"
+    "@json-rpc-tools/types" "^1.5.1"
     caip "^0.9.2"
 
 caip@^0.9.2:

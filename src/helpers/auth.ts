@@ -1,12 +1,12 @@
 import Store from '@pedrouid/iso-store';
 import { KeyPair } from 'mnemonic-keyring';
-import { ChainJsonRpc } from 'caip-api';
 import {
   BlockchainAuthenticator,
   BlockchainProvider,
 } from '@json-rpc-tools/blockchain';
 
 import { getChainSignerConnection } from './signer';
+import { ChainJsonRpc } from './types';
 
 export async function generateChainAuthenticator(
   chainId: string,
