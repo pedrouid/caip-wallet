@@ -15,9 +15,10 @@ import {
   generateChainAuthenticator,
   ChainJsonRpcMap,
   CaipWalletConfig,
+  ICaipWallet,
 } from '../helpers';
 
-export class CaipWallet implements IEvents {
+export class CaipWallet implements ICaipWallet {
   public events = new EventEmitter();
 
   public chains: ChainAuthenticatorsMap;
