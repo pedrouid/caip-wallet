@@ -6,7 +6,6 @@ import {
   JsonRpcResponse,
 } from '@json-rpc-tools/utils';
 import { getChainConfig, getChainJsonRpc } from 'caip-api';
-import { timeStamp } from 'console';
 import { EventEmitter } from 'events';
 import Keyring from 'mnemonic-keyring';
 
