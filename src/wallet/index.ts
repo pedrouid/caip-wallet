@@ -26,7 +26,7 @@ export class CaipWallet implements ICaipWallet {
   public mnemonic: string;
 
   public static async init(opts: CaipWalletOptions): Promise<CaipWallet> {
-    const { chainIds, store } = opts;
+    const { chainIds, storage } = opts;
     const keyring = await Keyring.init({ ...opts });
     const chains: ChainAuthenticatorsMap = {};
     const jsonrpc: ChainJsonRpcMap = {};
@@ -44,7 +44,7 @@ export class CaipWallet implements ICaipWallet {
           rpcUrl,
           keyPair,
           jsonrpc[chainId],
-          store
+          storage
         );
       })
     );

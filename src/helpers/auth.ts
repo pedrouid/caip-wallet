@@ -1,4 +1,4 @@
-import Store from '@pedrouid/iso-store';
+import { IKeyValueStorage } from 'keyvaluestorage';
 import { KeyPair } from 'mnemonic-keyring';
 import {
   BlockchainAuthenticator,
@@ -13,7 +13,7 @@ export async function generateChainAuthenticator(
   rpcUrl: string,
   keyPair: KeyPair,
   jsonrpc: ChainJsonRpc,
-  store?: Store
+  storage?: IKeyValueStorage
 ): Promise<BlockchainAuthenticator> {
   const SignerConnection = getChainSignerConnection(chainId);
   const provider = new BlockchainProvider(rpcUrl, {
@@ -31,7 +31,7 @@ export async function generateChainAuthenticator(
   const auth = new BlockchainAuthenticator({
     provider,
     requiredApproval: jsonrpc.wallet.auth,
-    store,
+    storage,
   });
   await auth.init();
   return auth;

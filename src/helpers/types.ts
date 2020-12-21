@@ -1,4 +1,4 @@
-import Store from '@pedrouid/iso-store';
+import { IKeyValueStorage } from 'keyvaluestorage';
 import Keyring, { KeyPair } from 'mnemonic-keyring';
 import {
   BlockchainJsonRpcConfig,
@@ -28,7 +28,7 @@ export type ChainJsonRpc = ChainJsonRpcRoutes & JsonRpcSchemas;
 
 export interface BaseCaipWalletOptions {
   chainIds: string[];
-  store?: Store;
+  storage?: IKeyValueStorage;
 }
 
 export interface GenerateChainAuthenticatorsOptions
