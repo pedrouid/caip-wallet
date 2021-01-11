@@ -70,6 +70,10 @@ export class CaipWallet implements ICaipWallet {
     this.events.off(event, listener);
   }
 
+  public removeListener(event: string, listener: any): void {
+    this.events.removeListener(event, listener);
+  }
+
   public async getChainIds(): Promise<string[]> {
     return Object.keys(this.chains);
   }

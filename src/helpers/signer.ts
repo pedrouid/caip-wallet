@@ -50,6 +50,10 @@ export class BlockchainSignerConnection implements IBlockchainSignerConnection {
     this.events.off(event, listener);
   }
 
+  public removeListener(event: string, listener: any): void {
+    this.events.removeListener(event, listener);
+  }
+
   public async open(): Promise<void> {
     this.onOpen();
   }
