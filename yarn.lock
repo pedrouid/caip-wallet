@@ -1343,34 +1343,34 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
-"@json-rpc-tools/blockchain@^1.5.6":
-  version "1.5.6"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/blockchain/-/blockchain-1.5.6.tgz#1b8aad5312e9168d842fa5bc9e553dea3026706b"
-  integrity sha512-pKtlK6+LtWRkmd4r+3TpqFjwDw6gswFOIphnPEUK/qRSoO6YoaODS5KERTrVY8Laj+GMTCfUNcd65mSFLK/B4Q==
+"@json-rpc-tools/blockchain@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/blockchain/-/blockchain-1.5.7.tgz#70850c49c33d99f411673d293650a53d6ef8093b"
+  integrity sha512-80UEnO9/xXXdS2atYj7kEr6lx3vUSEnaIdxBLnOG9afRw5khLuPf3gMi2v9E9C7cRspbNq9eaHvJmFsUFAwXrw==
   dependencies:
-    "@json-rpc-tools/provider" "^1.5.6"
-    "@json-rpc-tools/router" "^1.5.6"
-    "@json-rpc-tools/utils" "^1.5.6"
-    "@json-rpc-tools/validator" "^1.5.6"
+    "@json-rpc-tools/provider" "^1.5.7"
+    "@json-rpc-tools/router" "^1.5.7"
+    "@json-rpc-tools/utils" "^1.5.7"
+    "@json-rpc-tools/validator" "^1.5.7"
     keyvaluestorage "^0.6.0"
 
-"@json-rpc-tools/provider@^1.5.6":
-  version "1.5.6"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/provider/-/provider-1.5.6.tgz#30b1732fdd7d24832a5abfd2e2a6f4b79b7a0865"
-  integrity sha512-9PUObCpMHapYGloMynfzSlIMU5145QgdA2uY1yYbE4mS0d97ada5UWxA6/iKX0EIqwCUALmsAc/akmEb+vdrQA==
+"@json-rpc-tools/provider@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/provider/-/provider-1.5.7.tgz#b7b366457a10d7d06ba6568ec76188f3135ac274"
+  integrity sha512-v1qsvSt13VbofEl92E6sC0fl+jfw+zhCKMCAxrxVE65U4ZooQQjA8cogKor/IBWw+81BVRqE9oujTaugypeN9A==
   dependencies:
-    "@json-rpc-tools/utils" "^1.5.6"
+    "@json-rpc-tools/utils" "^1.5.7"
     axios "^0.21.0"
     safe-json-utils "^1.1.1"
     ws "^7.4.0"
 
-"@json-rpc-tools/router@^1.5.6":
-  version "1.5.6"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/router/-/router-1.5.6.tgz#283afb98bb5491a1c0a591652c5ae8743a5b5436"
-  integrity sha512-4K0R6OWDsDRWhT0y5QppTADihjwHDgFuMnm8atuOqmsA+mbtvJU9z879lEiUhCt1s+OIs7hMPRzowNnQYbDNNw==
+"@json-rpc-tools/router@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/router/-/router-1.5.7.tgz#cee1d4c08710c1217f01f49bac18534eb6dcd252"
+  integrity sha512-QKHtncHTGUKyQeBJw+PEi3WYPPRXOCfdONDpHmU+qqJiUzBQLJsiCxJ4uXkTX3WuAv1bENAapX7YQyatvLchpQ==
   dependencies:
-    "@json-rpc-tools/utils" "^1.5.6"
-    "@json-rpc-tools/validator" "^1.5.6"
+    "@json-rpc-tools/utils" "^1.5.7"
+    "@json-rpc-tools/validator" "^1.5.7"
     lodash.difference "^4.5.0"
 
 "@json-rpc-tools/types@^1.5.6":
@@ -1380,19 +1380,26 @@
   dependencies:
     keyvaluestorage "^0.6.0"
 
-"@json-rpc-tools/utils@^1.5.6":
-  version "1.5.6"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/utils/-/utils-1.5.6.tgz#a44363096478d300c734fca3587fb7dcbcf0a095"
-  integrity sha512-phpvEvWT3j+VGfBCvB4WglkPqh4+QphTh/omqzaPAdMXbrOXi6TnGwqaG59ZJRGF2WSiJVZEUe5nEiTQBPtfwA==
+"@json-rpc-tools/types@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/types/-/types-1.5.7.tgz#6bfce4db9bfe5a40123866c520351c454f8da195"
+  integrity sha512-IlcqmYjrwAQ3sexea/0CB0JVFRrjblpk7SzlbiqHCNtYczgWIT8wrezpfFVC6S1XfIvKm9fIhqg2zU4FUsfh6w==
   dependencies:
-    "@json-rpc-tools/types" "^1.5.6"
+    keyvaluestorage "^0.6.0"
 
-"@json-rpc-tools/validator@^1.5.6":
-  version "1.5.6"
-  resolved "https://registry.yarnpkg.com/@json-rpc-tools/validator/-/validator-1.5.6.tgz#a0dbcdd1034d7a506a8d7d5e58bd2b2fe039e786"
-  integrity sha512-Ybbsdp4lroexoxgCi+fzSMKi29LXLXejErdQvivGhaWSBwCvifc2YovVv7XOVh4S3o1VbkzQ9vyJYI8hoklJzw==
+"@json-rpc-tools/utils@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/utils/-/utils-1.5.7.tgz#932fa5b7885919e746caff0d32a61b613c631fd6"
+  integrity sha512-AE7p5p15Lgu/L6onIaQfvIEUHD3U95hmOBNp3rdIe/lTjZIZrwm+CUiA/UAa+4QqwlG74Ri4fKbm+uriW5HaZA==
   dependencies:
-    "@json-rpc-tools/utils" "^1.5.6"
+    "@json-rpc-tools/types" "^1.5.7"
+
+"@json-rpc-tools/validator@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@json-rpc-tools/validator/-/validator-1.5.7.tgz#35a4e61cbee0350ae12471e4afae9e73832def70"
+  integrity sha512-yDv01kjDJ6JP7awXtwvwyADUEakShgUlAluC8FXb4Do3Z2UU028LYbNUcTZHFP+iKkJppRLCV4iKpR6Mbjk0VQ==
+  dependencies:
+    "@json-rpc-tools/utils" "^1.5.7"
     jsonschema "^1.4.0"
 
 "@rollup/plugin-commonjs@^11.0.0":

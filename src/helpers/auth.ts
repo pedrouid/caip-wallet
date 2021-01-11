@@ -1,12 +1,20 @@
+import { getChainConfig, getChainJsonRpcSchemas } from 'caip-api';
 import { IKeyValueStorage } from 'keyvaluestorage';
-import { KeyPair } from 'mnemonic-keyring';
+import Keyring, { KeyPair } from 'mnemonic-keyring';
 import {
   BlockchainAuthenticator,
   BlockchainProvider,
 } from '@json-rpc-tools/blockchain';
 
 import { getChainSignerConnection } from './signer';
-import { ChainJsonRpc } from './types';
+import {
+  CaipWalletConfig,
+  CaipWalletOptions,
+  ChainAuthenticatorsMap,
+  ChainJsonRpc,
+  ChainJsonRpcMap,
+} from './types';
+import { getChainJsonRpcRoutes } from './jsonrpc';
 
 export async function generateChainAuthenticator(
   chainId: string,
@@ -35,4 +43,32 @@ export async function generateChainAuthenticator(
   });
   await auth.init();
   return auth;
+}
+
+export async function generateCaipWalletConfig(
+  opts: CaipWalletOptions
+): Promise<CaipWalletConfig> {
+  const { chainIds, storage } = opts;
+  const keyring = await Keyring.init({ ...opts });
+  const chains: ChainAuthenticatorsMap = {};
+  const jsonrpc: ChainJsonRpcMap = {};
+  await Promise.all(
+    chainIds.map(async (chainId: string) => {
+      const config = getChainConfig(chainId);
+      const keyPair = keyring.getKeyPair(config.derivationPath);
+      const rpcUrl = `https://${config.rpcUrl}`;
+      jsonrpc[chainId] = {
+        ...getChainJsonRpcRoutes(chainId),
+        ...getChainJsonRpcSchemas(chainId),
+      };
+      chains[chainId] = await generateChainAuthenticator(
+        chainId,
+        rpcUrl,
+        keyPair,
+        jsonrpc[chainId],
+        storage
+      );
+    })
+  );
+  return { chains, jsonrpc, mnemonic: keyring.mnemonic };
 }
