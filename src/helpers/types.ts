@@ -27,7 +27,7 @@ export interface ChainJsonRpcRoutes extends BlockchainJsonRpcConfig {
 export type ChainJsonRpc = ChainJsonRpcRoutes & JsonRpcSchemas;
 
 export interface BaseCaipWalletOptions {
-  chainIds: string[];
+  chains: string[];
   storage?: IKeyValueStorage;
 }
 
@@ -41,7 +41,7 @@ export interface CaipWalletOptions extends BaseCaipWalletOptions {
 }
 
 export interface CaipWalletConfig {
-  chains: ChainAuthenticatorsMap;
+  auth: ChainAuthenticatorsMap;
   jsonrpc: ChainJsonRpcMap;
   mnemonic: string;
 }
@@ -52,7 +52,7 @@ export interface SignerConnectionOptions {
 }
 
 export abstract class ICaipWallet extends IEvents {
-  public abstract chains: ChainAuthenticatorsMap;
+  public abstract auth: ChainAuthenticatorsMap;
   public abstract jsonrpc: ChainJsonRpcMap;
   public abstract mnemonic: string;
 
@@ -60,9 +60,9 @@ export abstract class ICaipWallet extends IEvents {
     super();
   }
 
-  public abstract getChainIds(): Promise<string[]>;
+  public abstract getChains(): Promise<string[]>;
 
-  public abstract getAccountIds(chainId: string): Promise<string[]>;
+  public abstract getAccounts(chainId: string): Promise<string[]>;
 
   public abstract approve(
     request: JsonRpcRequest,

@@ -25,19 +25,19 @@ describe('caip-wallet', () => {
   beforeAll(async () => {
     wallet = await Wallet.init({
       mnemonic: TEST_MNEMONIC,
-      chainIds: TEST_CHAINS,
+      chains: TEST_CHAINS,
     });
   });
   it('init', async () => {
     expect(wallet).toBeTruthy();
   });
-  it('getChainIds', async () => {
-    const chains = await wallet.getChainIds();
+  it('getChains', async () => {
+    const chains = await wallet.getChains();
     expect(chains).toBeTruthy();
     expect(chains).toEqual(TEST_CHAINS);
   });
-  it('getAccountIds', async () => {
-    const accounts = await wallet.getAccountIds(TEST_ETH_CHAIN_ID);
+  it('getAccounts', async () => {
+    const accounts = await wallet.getAccounts(TEST_ETH_CHAIN_ID);
     expect(accounts).toBeTruthy();
     expect(accounts).toEqual(TEST_ACCOUNTS);
   });

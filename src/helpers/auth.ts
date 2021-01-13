@@ -48,12 +48,12 @@ export async function generateChainAuthenticator(
 export async function generateCaipWalletConfig(
   opts: CaipWalletOptions
 ): Promise<CaipWalletConfig> {
-  const { chainIds, storage } = opts;
+  const { chains, storage } = opts;
   const keyring = await Keyring.init({ ...opts });
-  const chains: ChainAuthenticatorsMap = {};
+  const auth: ChainAuthenticatorsMap = {};
   const jsonrpc: ChainJsonRpcMap = {};
   await Promise.all(
-    chainIds.map(async (chainId: string) => {
+    chains.map(async (chainId: string) => {
       const config = getChainConfig(chainId);
       const keyPair = keyring.getKeyPair(config.derivationPath);
       const rpcUrl = `https://${config.rpcUrl}`;
@@ -61,7 +61,7 @@ export async function generateCaipWalletConfig(
         ...getChainJsonRpcRoutes(chainId),
         ...getChainJsonRpcSchemas(chainId),
       };
-      chains[chainId] = await generateChainAuthenticator(
+      auth[chainId] = await generateChainAuthenticator(
         chainId,
         rpcUrl,
         keyPair,
@@ -70,5 +70,5 @@ export async function generateCaipWalletConfig(
       );
     })
   );
-  return { chains, jsonrpc, mnemonic: keyring.mnemonic };
+  return { auth, jsonrpc, mnemonic: keyring.mnemonic };
 }

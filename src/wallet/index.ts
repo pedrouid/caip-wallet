@@ -18,7 +18,7 @@ import {
 export class CaipWallet implements ICaipWallet {
   public events = new EventEmitter();
 
-  public chains: ChainAuthenticatorsMap;
+  public auth: ChainAuthenticatorsMap;
   public jsonrpc: ChainJsonRpcMap;
   public mnemonic: string;
 
@@ -28,7 +28,7 @@ export class CaipWallet implements ICaipWallet {
   }
 
   constructor(config: CaipWalletConfig) {
-    this.chains = config.chains;
+    this.auth = config.auth;
     this.jsonrpc = config.jsonrpc;
     this.mnemonic = config.mnemonic;
     this.registerEventListeners();
@@ -50,14 +50,14 @@ export class CaipWallet implements ICaipWallet {
     this.events.removeListener(event, listener);
   }
 
-  public async getChainIds(): Promise<string[]> {
-    return Object.keys(this.chains);
+  public async getChains(): Promise<string[]> {
+    return Object.keys(this.auth);
   }
 
-  public async getAccountIds(chainId: string): Promise<string[]> {
+  public async getAccounts(chainId: string): Promise<string[]> {
     const method = this.jsonrpc[chainId].wallet.accounts;
     const request = formatJsonRpcRequest(method, []);
-    const response = await this.chains[chainId].resolve(request);
+    const response = await this.auth[chainId].resolve(request);
     if (isJsonRpcError(response)) {
       throw new Error(response.error.message);
     }
@@ -69,28 +69,28 @@ export class CaipWallet implements ICaipWallet {
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.chains[chainId].approve(request);
+    return this.auth[chainId].approve(request);
   }
 
   public async reject(
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.chains[chainId].reject(request);
+    return this.auth[chainId].reject(request);
   }
 
   public async resolve(
     request: JsonRpcRequest,
     chainId: string
   ): Promise<JsonRpcResponse> {
-    return this.chains[chainId].resolve(request);
+    return this.auth[chainId].resolve(request);
   }
 
   // ---------- Private ----------------------------------------------- //
 
   private registerEventListeners() {
-    Object.keys(this.chains).forEach(chainId => {
-      this.chains[chainId].on('pending_approval', (request: JsonRpcRequest) => {
+    Object.keys(this.auth).forEach(chainId => {
+      this.auth[chainId].on('pending_approval', (request: JsonRpcRequest) => {
         this.events.emit('pending_approval', { chainId, request });
       });
     });

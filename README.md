@@ -9,7 +9,7 @@ import CaipWallet from "caip-wallet";
 
 // Initiate Wallet with target chains
 const wallet = await CaipWallet.init({
-  chainIds: ["eip155:1"],
+  chains: ["eip155:1"],
   mnemonic:
     "basic guard spider horse civil trumpet into chalk basket month cabbage walk",
 });
@@ -50,9 +50,9 @@ export abstract class ICaipWallet extends IEvents {
     super();
   }
 
-  public abstract getChainIds(): Promise<string[]>;
+  public abstract getChains(): Promise<string[]>;
 
-  public abstract getAccountIds(chainId: string): Promise<string[]>;
+  public abstract getAccounts(chainId: string): Promise<string[]>;
 
   public abstract approve(
     request: JsonRpcRequest,
