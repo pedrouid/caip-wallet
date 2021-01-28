@@ -38,6 +38,10 @@ export class BlockchainSignerConnection implements IBlockchainSignerConnection {
     return true;
   }
 
+  get connecting(): boolean {
+    return false;
+  }
+
   public on(event: string, listener: any): void {
     this.events.on(event, listener);
   }

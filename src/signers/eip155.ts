@@ -24,6 +24,8 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
 
   public wallet: Wallet | undefined;
 
+  private registering = false;
+
   constructor(opts: SignerConnectionOptions) {
     this.url = opts.rpcUrl;
     this.keyPair = opts.keyPair;
@@ -32,6 +34,10 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
 
   get connected(): boolean {
     return typeof this.wallet !== 'undefined';
+  }
+
+  get connecting(): boolean {
+    return this.registering;
   }
 
   public on(event: string, listener: any): void {
@@ -122,7 +128,18 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
   // ---------- Private ----------------------------------------------- //
 
   private async register(url = this.url): Promise<Wallet> {
+    if (this.registering) {
+      return new Promise((resolve, reject) => {
+        this.events.once('open', () => {
+          if (typeof this.wallet === 'undefined') {
+            return reject(new Error('EIP155 signer is missing or invalid'));
+          }
+          resolve(this.wallet);
+        });
+      });
+    }
     this.url = url;
+    this.registering = true;
     const wallet = new Wallet(
       this.keyPair.privateKey,
       new providers.JsonRpcProvider(this.url)
@@ -133,6 +150,7 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
 
   private onOpen(wallet: Wallet) {
     this.wallet = wallet;
+    this.registering = false;
     this.events.emit('open');
   }
 
