@@ -3,10 +3,10 @@ import { ChainJsonRpcRoutes } from '../helpers';
 const EIP155AccountsMethod = 'eth_accounts';
 
 const EIP155SigningMethods: string[] = [
-  'eth_sendTransaction',
-  'eth_signTransaction',
   'eth_sign',
   'eth_signTypedData',
+  'eth_signTransaction',
+  'eth_sendTransaction',
   'personal_sign',
 ];
 

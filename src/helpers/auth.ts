@@ -59,7 +59,7 @@ export async function generateCaipWalletConfig(
       const rpcUrl = `https://${config.rpcUrl}`;
       jsonrpc[chainId] = {
         ...getChainJsonRpcRoutes(chainId),
-        ...getChainJsonRpcSchemas(chainId),
+        schemas: getChainJsonRpcSchemas(chainId),
       };
       auth[chainId] = await generateChainAuthenticator(
         chainId,

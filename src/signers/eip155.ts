@@ -6,7 +6,6 @@ import {
   formatJsonRpcResult,
   IJsonRpcProvider,
   JsonRpcRequest,
-  JsonRpcResponse,
 } from '@json-rpc-tools/utils';
 import { JsonRpcProvider } from '@json-rpc-tools/provider';
 
@@ -72,57 +71,73 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
       // assume latest spec is being and replace version identifiers
       request.method = 'eth_signTypedData';
     }
-    let result: any;
-    switch (request.method) {
-      case 'eth_accounts':
-        result = [await this.wallet.getAddress()];
-        break;
-      case 'eth_sendTransaction':
-        result = await this.wallet.sendTransaction(request.params[0]);
-        break;
-      case 'eth_signTransaction':
-        result = await this.wallet.signTransaction(request.params[0]);
-        break;
-      case 'eth_sign':
-        result = await this.legacySignMessage(request);
-        break;
-      case 'eth_signTypedData':
-        result = await this.wallet._signTypedData(
-          request.params[1].domain,
-          request.params[1].types,
-          request.params[1].message
-        );
-        break;
-      case 'personal_sign':
-        result = await this.wallet.signMessage(
-          utils.isHexString(request.params[0])
-            ? utils.arrayify(request.params[0])
-            : request.params[0]
-        );
-        break;
-      default:
-        break;
-    }
-    let response: JsonRpcResponse;
     try {
-      response = formatJsonRpcResult(request.id, result);
+      const address = await this.wallet.getAddress();
+      let result: any;
+      switch (request.method) {
+        case 'eth_accounts':
+          result = [address];
+          break;
+        case 'eth_sendTransaction':
+          if (request.params[0]?.from.toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet.sendTransaction(request.params[0]);
+          break;
+        case 'eth_signTransaction':
+          if (request.params[0]?.from.toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet.signTransaction(request.params[0]);
+          break;
+        case 'eth_sign':
+          if (request.params[0].toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet.signMessage(
+            utils.isHexString(request.params[1])
+              ? utils.arrayify(request.params[1])
+              : request.params[1]
+          );
+          break;
+        case 'eth_signTypedData':
+          if (request.params[0].toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet._signTypedData(
+            request.params[1].domain,
+            request.params[1].types,
+            request.params[1].message
+          );
+          break;
+        case 'personal_sign':
+          if (request.params[1].toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet.signMessage(
+            utils.isHexString(request.params[0])
+              ? utils.arrayify(request.params[0])
+              : request.params[0]
+          );
+          break;
+        default:
+          break;
+      }
+
+      this.events.emit('payload', formatJsonRpcResult(request.id, result));
     } catch (e) {
-      response = formatJsonRpcError(request.id, e.message);
+      this.events.emit('payload', formatJsonRpcError(request.id, e.message));
     }
-
-    this.events.emit('payload', response);
-  }
-
-  // ---------- Protected ----------------------------------------------- //
-
-  protected async legacySignMessage(request: JsonRpcRequest): Promise<string> {
-    if (typeof this.wallet === 'undefined') {
-      this.wallet = await this.register();
-    }
-    const signingKey = new utils.SigningKey(this.wallet.privateKey);
-    const sigParams = signingKey.signDigest(utils.arrayify(request.params[1]));
-    const result = utils.joinSignature(sigParams);
-    return result;
   }
 
   // ---------- Private ----------------------------------------------- //
