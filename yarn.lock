@@ -2884,10 +2884,10 @@ cache-base@^1.0.1:
     union-value "^1.0.0"
     unset-value "^1.0.0"
 
-caip-api@^1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/caip-api/-/caip-api-1.4.2.tgz#21503beaf1fb631f22399134fdbbc965cef71cd6"
-  integrity sha512-oZ6wjbgH1e4cveyZq7PYfu/Sgdf+4wwYgcxJXBAPM24CkLyXMHesGAY/gXZuoVr01fEkm11gOZpNTt19Rs+MkQ==
+caip-api@^1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/caip-api/-/caip-api-1.4.3.tgz#70a9f6dbb361b2edaa2b07653d6315658228bc73"
+  integrity sha512-Y12LiZD/n8TgCd+hoXLw8RggnMt1U2HnsCqStFh9WN1+7uG3GRZOkjavcS6jH0jPVUJn76w5bw1LAiYCKj+o7Q==
   dependencies:
     "@json-rpc-tools/types" "^1.6.1"
     caip "^0.9.2"
