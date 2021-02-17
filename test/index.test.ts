@@ -4,21 +4,21 @@ import Wallet from '../src';
 
 const TEST_ETH_CHAIN_ID = 'eip155:1';
 
-const TEST_ETH_ADDRESS = '0xa89Df33a6f26c29ea23A9Ff582E865C03132b140';
+const TEST_ETH_ADDRESS = '0xEc90a68010fd3CF4A90EB01F4977d442d62F4C76';
 
 const TEST_CHAINS = [TEST_ETH_CHAIN_ID];
 
 const TEST_ACCOUNTS = [`${TEST_ETH_ADDRESS}@${TEST_ETH_CHAIN_ID}`];
 
 const TEST_MNEMONIC =
-  'basic guard spider horse civil trumpet into chalk basket month cabbage walk';
+  'raven what cart burst flag helmet chalk job board grocery tomato measure';
 
 const TEST_MESSAGE = utils.hexlify(
   utils.toUtf8Bytes(`Approving a test message with ${TEST_ETH_ADDRESS}`)
 );
 
 const TEST_SIGNATURE =
-  '0x6ebcf4d9998a31a29cc8e7d9aa6ca85b5ea2c31427e529f607214cd03d96124e741f31080e6aa606abb3ea7d6aa498a7dba8659a57478016a9061ae9d448a9691c';
+  '0x10635ed1d7055f1109416d3408ee98379c20b57bdac58c4626b67b26870f738405a9ef1007b9656552025dfb11b8ed152938f265da720857b2fda8dc86d2bdf41b';
 
 describe('caip-wallet', () => {
   let wallet: Wallet;
