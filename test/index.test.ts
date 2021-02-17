@@ -17,6 +17,12 @@ const TEST_MESSAGE = utils.hexlify(
   utils.toUtf8Bytes(`Approving a test message with ${TEST_ETH_ADDRESS}`)
 );
 
+const TEST_TRANSACTION = {
+  from: TEST_ETH_ADDRESS,
+  to: TEST_ETH_ADDRESS,
+  data: '0x',
+};
+
 const TEST_SIGNATURE =
   '0x10635ed1d7055f1109416d3408ee98379c20b57bdac58c4626b67b26870f738405a9ef1007b9656552025dfb11b8ed152938f265da720857b2fda8dc86d2bdf41b';
 
@@ -41,6 +47,22 @@ describe('caip-wallet', () => {
     expect(accounts).toBeTruthy();
     expect(accounts).toEqual(TEST_ACCOUNTS);
   });
+  it('eth_sign', async () => {
+    wallet.on('pending_approval', ({ chainId, request }) => {
+      if (chainId === TEST_ETH_CHAIN_ID && request.method === 'eth_sign') {
+        wallet.approve(request, chainId);
+      }
+    });
+    const request = formatJsonRpcRequest('eth_sign', [
+      TEST_ETH_ADDRESS,
+      TEST_MESSAGE,
+    ]);
+    const response = await wallet.resolve(request, TEST_ETH_CHAIN_ID);
+    if (isJsonRpcError(response)) throw new Error(response.error.message);
+    expect(response).toBeTruthy();
+    expect(response.result).toBeTruthy();
+    expect(response.result).toEqual(TEST_SIGNATURE);
+  });
   it('personal_sign', async () => {
     wallet.on('pending_approval', ({ chainId, request }) => {
       if (chainId === TEST_ETH_CHAIN_ID && request.method === 'personal_sign') {
@@ -56,5 +78,43 @@ describe('caip-wallet', () => {
     expect(response).toBeTruthy();
     expect(response.result).toBeTruthy();
     expect(response.result).toEqual(TEST_SIGNATURE);
+  });
+  it('eth_sendTransaction', async () => {
+    wallet.on('pending_approval', ({ chainId, request }) => {
+      if (
+        chainId === TEST_ETH_CHAIN_ID &&
+        request.method === 'eth_sendTransaction'
+      ) {
+        wallet.approve(request, chainId);
+      }
+    });
+    const request = formatJsonRpcRequest('eth_sendTransaction', [
+      TEST_TRANSACTION,
+    ]);
+    const response = await wallet.resolve(request, TEST_ETH_CHAIN_ID);
+    if (isJsonRpcError(response)) throw new Error(response.error.message);
+    expect(response).toBeTruthy();
+    expect(response.result).toBeTruthy();
+    expect(typeof response.result).toEqual('string');
+    expect(response.result.length).toEqual(66);
+  });
+  it('eth_signTransaction', async () => {
+    wallet.on('pending_approval', ({ chainId, request }) => {
+      if (
+        chainId === TEST_ETH_CHAIN_ID &&
+        request.method === 'eth_signTransaction'
+      ) {
+        wallet.approve(request, chainId);
+      }
+    });
+    const request = formatJsonRpcRequest('eth_signTransaction', [
+      TEST_TRANSACTION,
+    ]);
+    const response = await wallet.resolve(request, TEST_ETH_CHAIN_ID);
+    if (isJsonRpcError(response)) throw new Error(response.error.message);
+    expect(response).toBeTruthy();
+    expect(response.result).toBeTruthy();
+    expect(typeof response.result).toEqual('string');
+    expect(response.result.length).toEqual(192);
   });
 });
