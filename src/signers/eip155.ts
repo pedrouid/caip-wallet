@@ -84,7 +84,7 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = await this.wallet.sendTransaction(request.params[0]);
+          result = (await this.wallet.sendTransaction(request.params[0])).hash;
           break;
         case 'eth_signTransaction':
           if (request.params[0]?.from.toLowerCase() !== address.toLowerCase()) {

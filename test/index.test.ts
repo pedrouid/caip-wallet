@@ -2,7 +2,7 @@ import { formatJsonRpcRequest, isJsonRpcError } from '@json-rpc-tools/utils';
 import { utils } from 'ethers';
 import Wallet from '../src';
 
-const TEST_ETH_CHAIN_ID = 'eip155:1';
+const TEST_ETH_CHAIN_ID = 'eip155:5';
 
 const TEST_ETH_ADDRESS = '0xEc90a68010fd3CF4A90EB01F4977d442d62F4C76';
 
