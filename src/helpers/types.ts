@@ -36,6 +36,13 @@ export interface GenerateChainAuthenticatorsOptions
   keyring: Keyring;
 }
 
+export interface ChainSignerOptions {
+  chainId: string;
+  index?: number;
+  customPath?: string;
+  jsonrpc?: ChainJsonRpc;
+}
+
 export interface CaipWalletOptions extends BaseCaipWalletOptions {
   mnemonic?: string;
 }

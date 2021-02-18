@@ -12,7 +12,7 @@ import {
   ChainJsonRpcMap,
   CaipWalletConfig,
   ICaipWallet,
-  generateCaipWalletConfig,
+  getCaipWalletConfig,
 } from '../helpers';
 
 export class CaipWallet implements ICaipWallet {
@@ -23,7 +23,7 @@ export class CaipWallet implements ICaipWallet {
   public mnemonic: string;
 
   public static async init(opts: CaipWalletOptions): Promise<CaipWallet> {
-    const config = await generateCaipWalletConfig(opts);
+    const config = await getCaipWalletConfig(opts);
     return new CaipWallet(config);
   }
 
