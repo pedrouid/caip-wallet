@@ -54,15 +54,17 @@ export class CaipWallet implements ICaipWallet {
     return Object.keys(this.auth);
   }
 
-  public async getAccounts(chainId: string): Promise<string[]> {
-    const method = this.jsonrpc[chainId].wallet.accounts;
-    const request = formatJsonRpcRequest(method, []);
-    const response = await this.auth[chainId].resolve(request);
-    if (isJsonRpcError(response)) {
-      throw new Error(response.error.message);
+  public async getAccounts(chainId?: string): Promise<string[]> {
+    if (typeof chainId === 'undefined') {
+      const chains = await this.getChains();
+      const accounts = (
+        await Promise.all<string[]>(
+          chains.map(chainId => this.getChainAccounts(chainId))
+        )
+      ).flat();
+      return accounts;
     }
-    const accounts = response.result.map(address => `${address}@${chainId}`);
-    return accounts;
+    return this.getChainAccounts(chainId);
   }
 
   public async approve(
@@ -87,6 +89,17 @@ export class CaipWallet implements ICaipWallet {
   }
 
   // ---------- Private ----------------------------------------------- //
+
+  private async getChainAccounts(chainId: string): Promise<string[]> {
+    const method = this.jsonrpc[chainId].wallet.accounts;
+    const request = formatJsonRpcRequest(method, []);
+    const response = await this.auth[chainId].resolve(request);
+    if (isJsonRpcError(response)) {
+      throw new Error(response.error.message);
+    }
+    const accounts = response.result.map(address => `${address}@${chainId}`);
+    return accounts;
+  }
 
   private registerEventListeners() {
     Object.keys(this.auth).forEach(chainId => {

@@ -69,7 +69,7 @@ export abstract class ICaipWallet extends IEvents {
 
   public abstract getChains(): Promise<string[]>;
 
-  public abstract getAccounts(chainId: string): Promise<string[]>;
+  public abstract getAccounts(chainId?: string): Promise<string[]>;
 
   public abstract approve(
     request: JsonRpcRequest,

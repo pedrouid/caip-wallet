@@ -1,12 +1,16 @@
 import { ChainJsonRpcRoutes } from '../helpers';
 
+const PolkadotAccountsMethod = 'polkadot_accounts';
+
+const PolkadotSigningMethods: string[] = ['polkadot_sign'];
+
 export const PolkadotJsonRpc: ChainJsonRpcRoutes = {
   routes: {
-    http: [],
-    signer: [],
+    http: ['polkadot_*'],
+    signer: [PolkadotAccountsMethod, ...PolkadotSigningMethods],
   },
   wallet: {
-    accounts: '',
-    auth: [],
+    accounts: PolkadotAccountsMethod,
+    auth: PolkadotSigningMethods,
   },
 };
