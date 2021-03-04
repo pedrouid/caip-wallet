@@ -53,9 +53,6 @@ export async function getChainProvider(
       routes: jsonrpc.routes.signer,
       connection: new SignerConnection({ keyPair, rpcUrl }),
     },
-    validator: {
-      schemas: jsonrpc.schemas,
-    },
   });
   await provider.connect();
   return provider;

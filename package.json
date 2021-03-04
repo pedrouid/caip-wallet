@@ -62,9 +62,9 @@
     "trailingComma": "es5"
   },
   "dependencies": {
-    "@json-rpc-tools/blockchain": "^1.6.3",
-    "@json-rpc-tools/provider": "^1.6.3",
-    "@json-rpc-tools/utils": "^1.6.3",
+    "@json-rpc-tools/blockchain": "^1.6.4",
+    "@json-rpc-tools/provider": "^1.6.4",
+    "@json-rpc-tools/utils": "^1.6.4",
     "caip": "^0.9.2",
     "caip-api": "^1.4.6",
     "ethers": "^5.0.30",
