@@ -71,6 +71,6 @@
     "caip": "^0.9.2",
     "caip-api": "^2.0.0-beta.1",
     "keyvaluestorage": "^0.7.1",
-    "mnemonic-keyring": "^1.4.0"
+    "mnemonic-keyring": "^2.0.0-beta.0"
   }
 }

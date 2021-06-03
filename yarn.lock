@@ -1429,10 +1429,10 @@
   resolved "https://registry.yarnpkg.com/@pedrouid/environment/-/environment-1.0.1.tgz#858f0f8a057340e0b250398b75ead77d6f4342ec"
   integrity sha512-HaW78NszGzRZd9SeoI3JD11JqY+lubnaOx7Pewj5pfjqWXOEATpeKIFb9Z4t2WBUK2iryiXX3lzWwmYWgUL0Ug==
 
-"@pedrouid/iso-random@^1.1.0":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@pedrouid/iso-random/-/iso-random-1.2.1.tgz#55178d9a2e7897b0f630dd1b4be76bc8460242d7"
-  integrity sha512-C35NqYMmLsg61WDiEup4OwjRhgfZIcK4BL+Qg49xowHUJ+f7/LFZCO+TGuQqoXFAj1beKIOpUN33f0fqV7zneQ==
+"@pedrouid/iso-random@^2.0.0-beta.5":
+  version "2.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@pedrouid/iso-random/-/iso-random-2.0.0-beta.5.tgz#cb69853947cbfbb66c1942864ab57d0e3ada4959"
+  integrity sha512-QlFqP1QFJfzV/8MGzpRWsHdCj0EWZWvv9mRJe+saaE/rbhjKZYwhOL4j0HhmQPeml6e4Ez3p6WkyzhXPxdPuQw==
   dependencies:
     "@pedrouid/environment" "^1.0.1"
     enc-utils "^3.0.0"
@@ -5988,12 +5988,12 @@ mkdirp@^1.0.3:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-mnemonic-keyring@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/mnemonic-keyring/-/mnemonic-keyring-1.4.0.tgz#f766c3ef660981030903ddc6bb44f240cfbeeda1"
-  integrity sha512-Peo4oupSy4UkeeqYpuJ5PUw4mjDj4lVetoD2R1LloMzoeA8UAXdLOXCUpooQZp7fq7kqtZeOUhDjoLcOWIJUiQ==
+mnemonic-keyring@^2.0.0-beta.0:
+  version "2.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/mnemonic-keyring/-/mnemonic-keyring-2.0.0-beta.0.tgz#3ec268054db89533634ca4953de3ddcc13a6061b"
+  integrity sha512-KHhk2s2FMLccBcXlc/wO+jtZ1gQ6dMP5Fxf8ws/RIK3U4UnQBoehzYN0mSc1E9ufBB5ZOBMsptr0KxL8d7tKZA==
   dependencies:
-    "@pedrouid/iso-random" "^1.1.0"
+    "@pedrouid/iso-random" "^2.0.0-beta.5"
     bcrypto "^5.4.0"
     bip32 "^2.0.6"
     bip39 "^3.0.3"
