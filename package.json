@@ -1,7 +1,7 @@
 {
   "name": "caip-wallet",
   "description": "CAIP-compatible Multi-Blockchain Wallet",
-  "version": "1.6.6",
+  "version": "2.0.0-beta.0",
   "author": "Pedro Gomes <github.com/pedrouid>",
   "license": "MIT",
   "keywords": [
