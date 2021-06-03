@@ -1,39 +1,27 @@
 import { EventEmitter } from 'events';
+import { providers, utils, Wallet } from 'ethers';
+import { IJsonRpcConnection } from '@json-rpc-tools/types';
 import { KeyPair } from 'mnemonic-keyring';
 import {
   formatJsonRpcError,
   formatJsonRpcResult,
-  IJsonRpcProvider,
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
-import { JsonRpcProvider } from '@json-rpc-tools/provider';
 
-import {
-  IBlockchainSignerConnection,
-  SignerConnectionOptions,
-} from '../helpers';
-
-type CosmosSigner = any;
-
-export class CosmosSignerConnection implements IBlockchainSignerConnection {
+export class CosmosSignerConnection implements IJsonRpcConnection {
   public events = new EventEmitter();
 
-  public url: string;
-  public keyPair: KeyPair;
-  public provider: IJsonRpcProvider;
-
-  public signer: CosmosSigner | undefined;
+  public wallet: Wallet | undefined;
 
   private registering = false;
 
-  constructor(opts: SignerConnectionOptions) {
-    this.url = opts.rpcUrl;
-    this.keyPair = opts.keyPair;
-    this.provider = new JsonRpcProvider(opts.rpcUrl);
+  constructor(public url: string, public keyPair: KeyPair) {
+    this.url = url;
+    this.keyPair = keyPair;
   }
 
   get connected(): boolean {
-    return typeof this.signer !== 'undefined';
+    return typeof this.wallet !== 'undefined';
   }
 
   get connecting(): boolean {
@@ -57,7 +45,7 @@ export class CosmosSignerConnection implements IBlockchainSignerConnection {
   }
 
   public async open(url: string = this.url): Promise<void> {
-    this.signer = await this.register(url);
+    this.wallet = await this.register(url);
   }
 
   public async close(): Promise<void> {
@@ -65,21 +53,44 @@ export class CosmosSignerConnection implements IBlockchainSignerConnection {
   }
 
   public async send(request: JsonRpcRequest): Promise<void> {
-    if (typeof this.signer === 'undefined') {
-      this.signer = await this.register();
+    if (typeof this.wallet === 'undefined') {
+      this.wallet = await this.register();
     }
+
     try {
-      // TODO: to be implemented
-      const address = 'cosmos1t2uflqwqe0fsj0shcfkrvpukewcw40yjj6hdc0';
+      const address = await this.wallet.getAddress();
       let result: any;
       switch (request.method) {
-        case 'cosmos_accounts':
-          // TODO: to be implemented
-          result = [address];
+        // TODO: relace these with actual Cosmos API methods
+        case 'cosmos_getAccounts':
+          // FIXME: returning hardcoded address
+          result = ['cosmos1t2uflqwqe0fsj0shcfkrvpukewcw40yjj6hdc0'];
           break;
-        case 'cosmos_sign':
-          // TODO: to be implemented
-          result = '';
+        // TODO: relace these with actual Cosmos API methods
+        case 'cosmos_signAmino':
+          if (request.params[0].toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet.signMessage(
+            utils.isHexString(request.params[1])
+              ? utils.arrayify(request.params[1])
+              : request.params[1]
+          );
+          break;
+        // TODO: relace these with actual Cosmos API methods
+        case 'cosmos_signDirect':
+          if (request.params[0].toLowerCase() !== address.toLowerCase()) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await this.wallet._signTypedData(
+            request.params[1].domain,
+            request.params[1].types,
+            request.params[1].message
+          );
           break;
         default:
           break;
@@ -93,26 +104,29 @@ export class CosmosSignerConnection implements IBlockchainSignerConnection {
 
   // ---------- Private ----------------------------------------------- //
 
-  private async register(url = this.url): Promise<CosmosSigner> {
+  private async register(url = this.url): Promise<Wallet> {
     if (this.registering) {
       return new Promise((resolve, reject) => {
         this.events.once('open', () => {
-          if (typeof this.signer === 'undefined') {
-            return reject(new Error('Cosmos signer is missing or invalid'));
+          if (typeof this.wallet === 'undefined') {
+            return reject(new Error('EIP155 signer is missing or invalid'));
           }
-          resolve(this.signer);
+          resolve(this.wallet);
         });
       });
     }
     this.url = url;
     this.registering = true;
-    const signer = {};
-    this.onOpen(signer);
-    return signer;
+    const wallet = new Wallet(
+      this.keyPair.privateKey,
+      new providers.JsonRpcProvider(this.url)
+    );
+    this.onOpen(wallet);
+    return wallet;
   }
 
-  private onOpen(signer: CosmosSigner) {
-    this.signer = signer;
+  private onOpen(wallet: Wallet) {
+    this.wallet = wallet;
     this.registering = false;
     this.events.emit('open');
   }
