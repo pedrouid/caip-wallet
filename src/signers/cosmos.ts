@@ -1,7 +1,11 @@
 import { EventEmitter } from 'events';
-import * as encUtils from 'enc-utils';
 
-import { DirectSecp256k1Wallet } from '@cosmjs/proto-signing';
+import {
+  CosmosWallet,
+  getCosmosAddress,
+  getCosmosAddressPrefix,
+} from 'cosmos-wallet';
+import { fromHex } from '@cosmjs/encoding';
 import { IJsonRpcConnection } from '@json-rpc-tools/types';
 import { KeyPair } from 'mnemonic-keyring';
 import {
@@ -10,16 +14,10 @@ import {
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
 
-import {
-  getCosmosAddressPrefix,
-  getCosmosAddress,
-  signAmino,
-} from '../helpers';
-
 export class CosmosSignerConnection implements IJsonRpcConnection {
   public events = new EventEmitter();
 
-  public wallet: DirectSecp256k1Wallet | undefined;
+  public wallet: CosmosWallet | undefined;
 
   private registering = false;
 
@@ -71,7 +69,10 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
     }
 
     try {
-      const address = getCosmosAddress(this.keyPair.publicKey, this.chainId);
+      const address = getCosmosAddress(
+        fromHex(this.keyPair.publicKey),
+        this.chainId
+      );
       let result: any;
       switch (request.method) {
         case 'cosmos_getAccounts':
@@ -98,7 +99,10 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = await signAmino(this.keyPair, request.params.signDoc);
+          result = await this.wallet.signAmino(
+            request.params.signerAddress,
+            request.params.signDoc
+          );
           break;
         default:
           break;
@@ -112,7 +116,7 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
 
   // ---------- Private ----------------------------------------------- //
 
-  private async register(url = this.url): Promise<DirectSecp256k1Wallet> {
+  private async register(url = this.url): Promise<CosmosWallet> {
     if (this.registering) {
       return new Promise((resolve, reject) => {
         this.events.once('open', () => {
@@ -126,15 +130,12 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
     this.url = url;
     this.registering = true;
     const prefix = getCosmosAddressPrefix(this.chainId);
-    const wallet = await DirectSecp256k1Wallet.fromKey(
-      encUtils.hexToArray(this.keyPair.privateKey),
-      prefix
-    );
+    const wallet = await CosmosWallet.init(this.keyPair.privateKey, prefix);
     this.onOpen(wallet);
     return wallet;
   }
 
-  private onOpen(wallet: DirectSecp256k1Wallet) {
+  private onOpen(wallet: CosmosWallet) {
     this.wallet = wallet;
     this.registering = false;
     this.events.emit('open');

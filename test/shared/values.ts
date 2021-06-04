@@ -1,6 +1,13 @@
 import { utils } from 'ethers';
 import { coins } from '@cosmjs/proto-signing';
 
+export const TEST_EIP155_KEYPAIR = {
+  publicKey:
+    '03adfe81f5d70efadcea0a84dceb4d7d2e9128ad50ef31e04cfc5e79f027091e60',
+  privateKey:
+    '43a533254c59d903a427948dc7c0976cea840bf16a6cfc76fcc5b6dd96d11e05',
+};
+
 export const TEST_EIP155_CHAIN_NAMESPACE = 'eip155';
 
 export const TEST_EIP155_CHAIN_REFERENCE = 5;
@@ -10,6 +17,13 @@ export const TEST_EIP155_CHAIN_ID = `${TEST_EIP155_CHAIN_NAMESPACE}:${TEST_EIP15
 export const TEST_EIP155_ADDRESS = '0xEc90a68010fd3CF4A90EB01F4977d442d62F4C76';
 
 export const TEST_EIP155_ACCOUNT = `${TEST_EIP155_ADDRESS}@${TEST_EIP155_CHAIN_ID}`;
+
+export const TEST_COSMOS_KEYPAIR = {
+  publicKey:
+    '0204848ceb8eafdf754251c2391466744e5a85529ec81ae6b60a187a90a9406396',
+  privateKey:
+    '366cd8d38f760f970bdc70b18d19f40756b92beeebc84074ceea8e092d406666',
+};
 
 export const TEST_COSMOS_CHAIN_NAMESPACE = 'cosmos';
 

@@ -41,10 +41,9 @@
     "prepare": "yarn lint && yarn build && yarn test"
   },
   "devDependencies": {
-    "@cosmjs/amino": "^0.25.4",
-    "@cosmjs/proto-signing": "^0.25.4",
     "@types/jest": "25.1.1",
     "@types/node": "13.7.0",
+    "cosmos-wallet": "^1.0.0",
     "ethers": "^5.0.30",
     "husky": "4.2.1",
     "tsdx": "0.12.3",
@@ -65,8 +64,7 @@
     "trailingComma": "es5"
   },
   "peerDependencies": {
-    "@cosmjs/amino": "^0.25.4",
-    "@cosmjs/proto-signing": "^0.25.4",
+    "cosmos-wallet": "^1.0.0",
     "ethers": "^5.0.30"
   },
   "dependencies": {

@@ -1,12 +1,7 @@
-import { utils } from 'ethers';
-import * as encUtils from 'enc-utils';
-import { toBase64 } from '@cosmjs/encoding';
-import { pubkeyToAddress, pubkeyType } from '@cosmjs/amino';
 import { IJsonRpcConnection, IJsonRpcProvider } from '@json-rpc-tools/types';
 import { JsonRpcProvider } from '@json-rpc-tools/provider';
 import Keyring, { KeyPair } from 'mnemonic-keyring';
 
-import { COSMOS_ADDRESS_PREFIX } from '../constants';
 import { EIP155SignerConnection, CosmosSignerConnection } from '../signers';
 import { apiGetChainData } from 'caip-api';
 
@@ -61,44 +56,11 @@ export async function getBlockchainKeyPair(
   return keyring.getKeyPair(getSlip44Path(chainData.slip44, index));
 }
 
-export function getCosmosAddressPrefix(chainId?: string) {
-  let prefix = 'cosmos';
-  if (typeof chainId !== 'undefined') {
-    const [namespace, reference] = chainId.split(':');
-    if (namespace !== 'cosmos') {
-      throw new Error(
-        `Cannot get address with incompatible namespace for chainId: ${chainId}`
-      );
-    }
-    const [name] = reference.split('-');
-    if (typeof name !== 'undefined') {
-      const match = COSMOS_ADDRESS_PREFIX[name];
-      if (typeof match !== 'undefined') {
-        prefix = match;
-      }
-    }
+export function parseAccounts(account: any, chainId: string) {
+  const [namespace] = chainId.split(':');
+  let address = account;
+  if (namespace === 'cosmos') {
+    address = account.address;
   }
-  return prefix;
-}
-
-export function getCosmosAddress(publicKey: string, chainId?: string) {
-  const prefix = getCosmosAddressPrefix(chainId);
-  // assume for now only secp256k1
-  const pubKey = {
-    type: pubkeyType.secp256k1,
-    value: toBase64(encUtils.hexToArray(publicKey)),
-  };
-  return pubkeyToAddress(pubKey, prefix);
-}
-
-export function getEip155Address(publicKey: string, chainId?: string) {
-  if (typeof chainId !== 'undefined') {
-    const [namespace] = chainId.split(':');
-    if (namespace !== 'eip155') {
-      throw new Error(
-        `Cannot get address with incompatible namespace for chainId: ${chainId}`
-      );
-    }
-  }
-  return utils.computeAddress(encUtils.hexToArray(publicKey));
+  return `${address}@${chainId}`;
 }

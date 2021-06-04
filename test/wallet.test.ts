@@ -1,4 +1,4 @@
-import * as encUtils from 'enc-utils';
+import { fromHex } from '@cosmjs/encoding';
 import { makeSignDoc, makeAuthInfoBytes } from '@cosmjs/proto-signing';
 
 import {
@@ -74,7 +74,7 @@ describe('Wallet', () => {
         sequence
       );
       const signDoc = makeSignDoc(
-        encUtils.hexToArray(bodyBytes),
+        fromHex(bodyBytes),
         authInfoBytes,
         TEST_COSMOS_CHAIN_REFERENCE,
         accountNumber
