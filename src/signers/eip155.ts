@@ -15,9 +15,14 @@ export class EIP155SignerConnection implements IJsonRpcConnection {
 
   private registering = false;
 
-  constructor(public url: string, public keyPair: KeyPair) {
+  constructor(
+    public url: string,
+    public keyPair: KeyPair,
+    public chainId: string
+  ) {
     this.url = url;
     this.keyPair = keyPair;
+    this.chainId = chainId;
   }
 
   get connected(): boolean {

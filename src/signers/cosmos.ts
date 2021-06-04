@@ -1,5 +1,7 @@
 import { EventEmitter } from 'events';
-import { providers, utils, Wallet } from 'ethers';
+import * as encUtils from 'enc-utils';
+
+import { DirectSecp256k1Wallet } from '@cosmjs/proto-signing';
 import { IJsonRpcConnection } from '@json-rpc-tools/types';
 import { KeyPair } from 'mnemonic-keyring';
 import {
@@ -8,16 +10,27 @@ import {
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
 
+import {
+  getCosmosAddressPrefix,
+  getCosmosAddress,
+  signAmino,
+} from '../helpers';
+
 export class CosmosSignerConnection implements IJsonRpcConnection {
   public events = new EventEmitter();
 
-  public wallet: Wallet | undefined;
+  public wallet: DirectSecp256k1Wallet | undefined;
 
   private registering = false;
 
-  constructor(public url: string, public keyPair: KeyPair) {
+  constructor(
+    public url: string,
+    public keyPair: KeyPair,
+    public chainId: string
+  ) {
     this.url = url;
     this.keyPair = keyPair;
+    this.chainId = chainId;
   }
 
   get connected(): boolean {
@@ -58,39 +71,34 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
     }
 
     try {
-      const address = await this.wallet.getAddress();
+      const address = getCosmosAddress(this.keyPair.publicKey, this.chainId);
       let result: any;
       switch (request.method) {
-        // TODO: relace these with actual Cosmos API methods
         case 'cosmos_getAccounts':
-          // FIXME: returning hardcoded address
-          result = ['cosmos1t2uflqwqe0fsj0shcfkrvpukewcw40yjj6hdc0'];
+          result = this.wallet.getAccounts();
           break;
-        // TODO: relace these with actual Cosmos API methods
-        case 'cosmos_signAmino':
-          if (request.params[0].toLowerCase() !== address.toLowerCase()) {
-            throw new Error(
-              `Method ${request.method} targetted incorrect account: ${address}`
-            );
-          }
-          result = await this.wallet.signMessage(
-            utils.isHexString(request.params[1])
-              ? utils.arrayify(request.params[1])
-              : request.params[1]
-          );
-          break;
-        // TODO: relace these with actual Cosmos API methods
         case 'cosmos_signDirect':
-          if (request.params[0].toLowerCase() !== address.toLowerCase()) {
+          if (
+            request.params.signerAddress.toLowerCase() !== address.toLowerCase()
+          ) {
             throw new Error(
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = await this.wallet._signTypedData(
-            request.params[1].domain,
-            request.params[1].types,
-            request.params[1].message
+          result = await this.wallet.signDirect(
+            request.params.signerAddress,
+            request.params.signDoc
           );
+          break;
+        case 'cosmos_signAmino':
+          if (
+            request.params.signerAddress.toLowerCase() !== address.toLowerCase()
+          ) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await signAmino(this.keyPair, request.params.signDoc);
           break;
         default:
           break;
@@ -104,12 +112,12 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
 
   // ---------- Private ----------------------------------------------- //
 
-  private async register(url = this.url): Promise<Wallet> {
+  private async register(url = this.url): Promise<DirectSecp256k1Wallet> {
     if (this.registering) {
       return new Promise((resolve, reject) => {
         this.events.once('open', () => {
           if (typeof this.wallet === 'undefined') {
-            return reject(new Error('EIP155 signer is missing or invalid'));
+            return reject(new Error('Cosmos signer is missing or invalid'));
           }
           resolve(this.wallet);
         });
@@ -117,15 +125,16 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
     }
     this.url = url;
     this.registering = true;
-    const wallet = new Wallet(
-      this.keyPair.privateKey,
-      new providers.JsonRpcProvider(this.url)
+    const prefix = getCosmosAddressPrefix(this.chainId);
+    const wallet = await DirectSecp256k1Wallet.fromKey(
+      encUtils.hexToArray(this.keyPair.privateKey),
+      prefix
     );
     this.onOpen(wallet);
     return wallet;
   }
 
-  private onOpen(wallet: Wallet) {
+  private onOpen(wallet: DirectSecp256k1Wallet) {
     this.wallet = wallet;
     this.registering = false;
     this.events.emit('open');

@@ -3,14 +3,17 @@ import Keyring from 'mnemonic-keyring';
 import { apiGetChainJsonRpc, apiGetChainNamespace } from 'caip-api';
 import { IJsonRpcProvider, RequestArguments } from '@json-rpc-tools/types';
 
-import { getNamespaces, getSlip44Path, getBlockchainProvider } from './getters';
 import {
   NamespaceConfig,
   NamespaceMap,
   ProvidersMap,
   WalletConfig,
   WalletOptions,
-} from './types';
+  getNamespaces,
+  getSlip44Path,
+  getBlockchainProvider,
+  parseAccounts,
+} from './helpers';
 
 export async function getNamespaceMap(chains: string[]) {
   const namespaces: NamespaceMap = {};
@@ -39,12 +42,13 @@ export async function getWalletConfig(
     chains.map(async (chainId: string) => {
       const [namespace, reference] = chainId.split(':');
       if (Object.keys(namespaces).includes(namespace)) {
-        if (Object.keys(namespaces[namespace].chains).includes(reference)) {
-          const chainData = namespaces[namespace].chains[reference];
+        const chainList = namespaces[namespace].chains;
+        if (Object.keys(chainList).includes(reference)) {
+          const chainData = chainList[reference];
           const rpcUrl = chainData.rpc[0];
           const keyPair = keyring.getKeyPair(getSlip44Path(chainData.slip44));
           const provider = await getBlockchainProvider(
-            namespace,
+            chainId,
             rpcUrl,
             keyPair
           );
@@ -126,7 +130,7 @@ export class Wallet {
       throw new Error(`Cannot get accounts for chainId: ${chainId}`);
     }
     const accounts = (await provider.request({ method })) || [];
-    return accounts.map(address => `${address}@${chainId}`);
+    return accounts.map(account => parseAccounts(account, chainId));
   }
 
   private getMethods(scope: string, chainId: string): string[] {
