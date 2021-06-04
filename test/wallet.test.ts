@@ -1,3 +1,6 @@
+import * as encUtils from 'enc-utils';
+import { coins, makeSignDoc, makeAuthInfoBytes } from '@cosmjs/proto-signing';
+
 import {
   TEST_EIP155_CHAIN_ID,
   TEST_EIP155_ADDRESS,
@@ -11,6 +14,10 @@ import {
   TEST_EIP155_TRANSACTION,
   TEST_EIP155_SIGNATURE,
   TEST_COSMOS_ACCOUNT,
+  TEST_COSMOS_CHAIN_REFERENCE,
+  TEST_COSMOS_INPUTS,
+  TEST_COSMOS_DIRECT_SIGNATURE,
+  TEST_COSMOS_AMINO_SIGNATURE,
 } from './shared';
 
 import Wallet from '../src';
@@ -49,6 +56,49 @@ describe('Wallet', () => {
       expect(result).toBeTruthy();
       expect(result[0].address).toEqual(TEST_COSMOS_ADDRESS);
       expect(result[0].algo).toEqual('secp256k1');
+    });
+    it('cosmos_signDirect', async () => {
+      const signerAddress = TEST_COSMOS_ADDRESS;
+      const {
+        fee,
+        pubkey,
+        gasLimit,
+        accountNumber,
+        sequence,
+        bodyBytes,
+      } = TEST_COSMOS_INPUTS.direct;
+      const authInfoBytes = makeAuthInfoBytes(
+        [pubkey as any],
+        fee,
+        gasLimit,
+        sequence
+      );
+      const signDoc = makeSignDoc(
+        encUtils.hexToArray(bodyBytes),
+        authInfoBytes,
+        TEST_COSMOS_CHAIN_REFERENCE,
+        accountNumber
+      );
+      const request = {
+        method: 'cosmos_signDirect',
+        params: { signerAddress, signDoc },
+      };
+      const context = { chainId: TEST_COSMOS_CHAIN_ID };
+      const result = await wallet.request(request, context);
+      expect(result).toBeTruthy();
+      expect(result.signature.signature).toEqual(TEST_COSMOS_DIRECT_SIGNATURE);
+    });
+    it('cosmos_signAmino', async () => {
+      const signerAddress = TEST_COSMOS_ADDRESS;
+      const signDoc = TEST_COSMOS_INPUTS.amino;
+      const request = {
+        method: 'cosmos_signAmino',
+        params: { signerAddress, signDoc },
+      };
+      const context = { chainId: TEST_COSMOS_CHAIN_ID };
+      const result = await wallet.request(request, context);
+      expect(result).toBeTruthy();
+      expect(result.signature.signature).toEqual(TEST_COSMOS_AMINO_SIGNATURE);
     });
   });
   describe('EIP155', () => {
