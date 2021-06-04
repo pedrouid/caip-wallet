@@ -1,5 +1,5 @@
 import * as encUtils from 'enc-utils';
-import { coins, makeSignDoc, makeAuthInfoBytes } from '@cosmjs/proto-signing';
+import { makeSignDoc, makeAuthInfoBytes } from '@cosmjs/proto-signing';
 
 import {
   TEST_EIP155_CHAIN_ID,
