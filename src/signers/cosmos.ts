@@ -1,39 +1,68 @@
 import { EventEmitter } from 'events';
+
+import {
+  CosmosWallet,
+  getCosmosAddress,
+  getCosmosAddressPrefix,
+  parseSignDocValues,
+  stringifyAccountDataValues,
+  stringifySignDocValues,
+} from 'cosmos-wallet';
+import { fromHex } from '@cosmjs/encoding';
+import { IJsonRpcConnection } from '@json-rpc-tools/types';
 import { KeyPair } from 'mnemonic-keyring';
 import {
   formatJsonRpcError,
   formatJsonRpcResult,
-  IJsonRpcProvider,
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
-import { JsonRpcProvider } from '@json-rpc-tools/provider';
 
-import {
-  IBlockchainSignerConnection,
-  SignerConnectionOptions,
-} from '../helpers';
+async function getAccounts(wallet: CosmosWallet) {
+  return (await wallet.getAccounts()).map(stringifyAccountDataValues);
+}
 
-type CosmosSigner = any;
+async function signDirect(
+  wallet: CosmosWallet,
+  signerAddress: string,
+  signDoc: any
+) {
+  const result = await wallet.signDirect(
+    signerAddress,
+    parseSignDocValues(signDoc)
+  );
+  return {
+    signed: stringifySignDocValues(result.signed),
+    signature: result.signature,
+  };
+}
 
-export class CosmosSignerConnection implements IBlockchainSignerConnection {
+async function signAmino(
+  wallet: CosmosWallet,
+  signerAddress: string,
+  signDoc: any
+) {
+  const result = await wallet.signAmino(signerAddress, signDoc);
+  return result;
+}
+export class CosmosSignerConnection implements IJsonRpcConnection {
   public events = new EventEmitter();
 
-  public url: string;
-  public keyPair: KeyPair;
-  public provider: IJsonRpcProvider;
-
-  public signer: CosmosSigner | undefined;
+  public wallet: CosmosWallet | undefined;
 
   private registering = false;
 
-  constructor(opts: SignerConnectionOptions) {
-    this.url = opts.rpcUrl;
-    this.keyPair = opts.keyPair;
-    this.provider = new JsonRpcProvider(opts.rpcUrl);
+  constructor(
+    public url: string,
+    public keyPair: KeyPair,
+    public chainId: string
+  ) {
+    this.url = url;
+    this.keyPair = keyPair;
+    this.chainId = chainId;
   }
 
   get connected(): boolean {
-    return typeof this.signer !== 'undefined';
+    return typeof this.wallet !== 'undefined';
   }
 
   get connecting(): boolean {
@@ -57,7 +86,7 @@ export class CosmosSignerConnection implements IBlockchainSignerConnection {
   }
 
   public async open(url: string = this.url): Promise<void> {
-    this.signer = await this.register(url);
+    this.wallet = await this.register(url);
   }
 
   public async close(): Promise<void> {
@@ -65,21 +94,47 @@ export class CosmosSignerConnection implements IBlockchainSignerConnection {
   }
 
   public async send(request: JsonRpcRequest): Promise<void> {
-    if (typeof this.signer === 'undefined') {
-      this.signer = await this.register();
+    if (typeof this.wallet === 'undefined') {
+      this.wallet = await this.register();
     }
+
     try {
-      // TODO: to be implemented
-      const address = 'cosmos1t2uflqwqe0fsj0shcfkrvpukewcw40yjj6hdc0';
+      const address = getCosmosAddress(
+        fromHex(this.keyPair.publicKey),
+        this.chainId
+      );
       let result: any;
       switch (request.method) {
-        case 'cosmos_accounts':
-          // TODO: to be implemented
-          result = [address];
+        case 'cosmos_getAccounts':
+          result = getAccounts(this.wallet);
           break;
-        case 'cosmos_sign':
-          // TODO: to be implemented
-          result = '';
+        case 'cosmos_signDirect':
+          if (
+            request.params.signerAddress.toLowerCase() !== address.toLowerCase()
+          ) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await signDirect(
+            this.wallet,
+            request.params.signerAddress,
+            request.params.signDoc
+          );
+          break;
+        case 'cosmos_signAmino':
+          if (
+            request.params.signerAddress.toLowerCase() !== address.toLowerCase()
+          ) {
+            throw new Error(
+              `Method ${request.method} targetted incorrect account: ${address}`
+            );
+          }
+          result = await signAmino(
+            this.wallet,
+            request.params.signerAddress,
+            request.params.signDoc
+          );
           break;
         default:
           break;
@@ -93,26 +148,27 @@ export class CosmosSignerConnection implements IBlockchainSignerConnection {
 
   // ---------- Private ----------------------------------------------- //
 
-  private async register(url = this.url): Promise<CosmosSigner> {
+  private async register(url = this.url): Promise<CosmosWallet> {
     if (this.registering) {
       return new Promise((resolve, reject) => {
         this.events.once('open', () => {
-          if (typeof this.signer === 'undefined') {
+          if (typeof this.wallet === 'undefined') {
             return reject(new Error('Cosmos signer is missing or invalid'));
           }
-          resolve(this.signer);
+          resolve(this.wallet);
         });
       });
     }
     this.url = url;
     this.registering = true;
-    const signer = {};
-    this.onOpen(signer);
-    return signer;
+    const prefix = getCosmosAddressPrefix(this.chainId);
+    const wallet = await CosmosWallet.init(this.keyPair.privateKey, prefix);
+    this.onOpen(wallet);
+    return wallet;
   }
 
-  private onOpen(signer: CosmosSigner) {
-    this.signer = signer;
+  private onOpen(wallet: CosmosWallet) {
+    this.wallet = wallet;
     this.registering = false;
     this.events.emit('open');
   }

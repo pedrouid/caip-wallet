@@ -1,88 +1,28 @@
-import { IKeyValueStorage } from 'keyvaluestorage';
-import Keyring, { KeyPair } from 'mnemonic-keyring';
-import {
-  BlockchainJsonRpcConfig,
-  IBlockchainAuthenticator,
-  IEvents,
-  JsonRpcRequest,
-  JsonRpcResponse,
-  JsonRpcSchemas,
-} from '@json-rpc-tools/utils';
+import { IJsonRpcProvider } from '@json-rpc-tools/types';
+import { ChainsMap, ChainJsonRpc } from 'caip-api';
+import { KeyValueStorage } from 'keyvaluestorage';
 
-export interface ChainAuthenticatorsMap {
-  [chainId: string]: IBlockchainAuthenticator;
-}
-
-export interface ChainJsonRpcMap {
-  [chainId: string]: ChainJsonRpc;
-}
-
-export interface ChainJsonRpcRoutes extends BlockchainJsonRpcConfig {
-  wallet: {
-    accounts: string;
-    auth: string[];
-  };
-}
-
-export type ChainJsonRpc = ChainJsonRpcRoutes & JsonRpcSchemas;
-
-export interface BaseCaipWalletOptions {
+export interface WalletOptions {
   chains: string[];
-  storage?: IKeyValueStorage;
-}
-
-export interface GenerateChainAuthenticatorsOptions
-  extends BaseCaipWalletOptions {
-  keyring: Keyring;
-}
-
-export interface ChainSignerOptions {
-  chainId: string;
-  index?: number;
-  customPath?: string;
-  jsonrpc?: ChainJsonRpc;
-}
-
-export interface CaipWalletOptions extends BaseCaipWalletOptions {
   mnemonic?: string;
+  storage?: KeyValueStorage;
 }
 
-export interface CaipWalletConfig {
-  auth: ChainAuthenticatorsMap;
-  jsonrpc: ChainJsonRpcMap;
+export interface ProvidersMap {
+  [chainId: string]: IJsonRpcProvider;
+}
+
+export interface NamespaceConfig {
+  chains: ChainsMap;
+  jsonrpc: ChainJsonRpc;
+}
+
+export type NamespaceMap = {
+  [namespace: string]: NamespaceConfig;
+};
+
+export interface WalletConfig {
   mnemonic: string;
-}
-
-export interface SignerConnectionOptions {
-  rpcUrl: string;
-  keyPair: KeyPair;
-}
-
-export abstract class ICaipWallet extends IEvents {
-  public abstract auth: ChainAuthenticatorsMap;
-  public abstract jsonrpc: ChainJsonRpcMap;
-  public abstract mnemonic: string;
-
-  constructor(config: CaipWalletConfig) {
-    super();
-  }
-
-  public abstract getChains(): Promise<string[]>;
-
-  public abstract getAccounts(chainId?: string): Promise<string[]>;
-
-  public abstract approve(
-    request: JsonRpcRequest,
-    chainId: string
-  ): Promise<JsonRpcResponse>;
-
-  public abstract reject(
-    request: JsonRpcRequest,
-    chainId: string
-  ): Promise<JsonRpcResponse>;
-
-  public abstract resolve(
-    request: JsonRpcRequest,
-    chainId: string
-  ): Promise<JsonRpcResponse>;
+  providers: ProvidersMap;
+  namespaces: NamespaceMap;
 }
