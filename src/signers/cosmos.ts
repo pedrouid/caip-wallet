@@ -4,6 +4,9 @@ import {
   CosmosWallet,
   getCosmosAddress,
   getCosmosAddressPrefix,
+  parseSignDocValues,
+  stringifyAccountDataValues,
+  stringifySignDocValues,
 } from 'cosmos-wallet';
 import { fromHex } from '@cosmjs/encoding';
 import { IJsonRpcConnection } from '@json-rpc-tools/types';
@@ -14,6 +17,33 @@ import {
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
 
+async function getAccounts(wallet: CosmosWallet) {
+  return (await wallet.getAccounts()).map(stringifyAccountDataValues);
+}
+
+async function signDirect(
+  wallet: CosmosWallet,
+  signerAddress: string,
+  signDoc: any
+) {
+  const result = await wallet.signDirect(
+    signerAddress,
+    parseSignDocValues(signDoc)
+  );
+  return {
+    signed: stringifySignDocValues(result.signed),
+    signature: result.signature,
+  };
+}
+
+async function signAmino(
+  wallet: CosmosWallet,
+  signerAddress: string,
+  signDoc: any
+) {
+  const result = await wallet.signAmino(signerAddress, signDoc);
+  return result;
+}
 export class CosmosSignerConnection implements IJsonRpcConnection {
   public events = new EventEmitter();
 
@@ -76,7 +106,7 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
       let result: any;
       switch (request.method) {
         case 'cosmos_getAccounts':
-          result = this.wallet.getAccounts();
+          result = getAccounts(this.wallet);
           break;
         case 'cosmos_signDirect':
           if (
@@ -86,7 +116,8 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = await this.wallet.signDirect(
+          result = await signDirect(
+            this.wallet,
             request.params.signerAddress,
             request.params.signDoc
           );
@@ -99,7 +130,8 @@ export class CosmosSignerConnection implements IJsonRpcConnection {
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = await this.wallet.signAmino(
+          result = await signAmino(
+            this.wallet,
             request.params.signerAddress,
             request.params.signDoc
           );

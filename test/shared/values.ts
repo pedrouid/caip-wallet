@@ -1,5 +1,4 @@
 import { utils } from 'ethers';
-import { coins } from '@cosmjs/proto-signing';
 
 export const TEST_EIP155_KEYPAIR = {
   publicKey:
@@ -59,7 +58,7 @@ export const TEST_EIP155_SIGNATURE =
 
 export const TEST_COSMOS_INPUTS = {
   direct: {
-    fee: coins(2000, 'ucosm'),
+    fee: [{ amount: '2000', denom: 'ucosm' }],
     pubkey: 'AgSEjOuOr991QlHCORRmdE5ahVKeyBrmtgoYepCpQGOW',
     gasLimit: 200000,
     accountNumber: 1,
