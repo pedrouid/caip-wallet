@@ -62,5 +62,5 @@ export function parseAccounts(account: any, chainId: string) {
   if (namespace === 'cosmos') {
     address = account.address;
   }
-  return `${address}@${chainId}`;
+  return `${chainId}:${address}`;
 }
