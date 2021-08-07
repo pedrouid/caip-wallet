@@ -1,10 +1,6 @@
-import Wallet from './wallet';
-
-export * from 'caip-api';
-
-export * from './helpers';
-export * from './jsonrpc';
+import W from './wallet';
 export * from './signers';
+export * from './helpers';
 export * from './wallet';
 
-export default Wallet;
+export default W;

@@ -1,34 +1,28 @@
 import { EventEmitter } from 'events';
 import { providers, utils, Wallet } from 'ethers';
+import { IJsonRpcConnection } from '@json-rpc-tools/types';
 import { KeyPair } from 'mnemonic-keyring';
 import {
   formatJsonRpcError,
   formatJsonRpcResult,
-  IJsonRpcProvider,
   JsonRpcRequest,
 } from '@json-rpc-tools/utils';
-import { JsonRpcProvider } from '@json-rpc-tools/provider';
 
-import {
-  IBlockchainSignerConnection,
-  SignerConnectionOptions,
-} from '../helpers';
-
-export class EIP155SignerConnection implements IBlockchainSignerConnection {
+export class EIP155SignerConnection implements IJsonRpcConnection {
   public events = new EventEmitter();
-
-  public url: string;
-  public keyPair: KeyPair;
-  public provider: IJsonRpcProvider;
 
   public wallet: Wallet | undefined;
 
   private registering = false;
 
-  constructor(opts: SignerConnectionOptions) {
-    this.url = opts.rpcUrl;
-    this.keyPair = opts.keyPair;
-    this.provider = new JsonRpcProvider(opts.rpcUrl);
+  constructor(
+    public url: string,
+    public keyPair: KeyPair,
+    public chainId: string
+  ) {
+    this.url = url;
+    this.keyPair = keyPair;
+    this.chainId = chainId;
   }
 
   get connected(): boolean {
@@ -73,6 +67,7 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
     }
     try {
       const address = await this.wallet.getAddress();
+      let tx: any;
       let result: any;
       switch (request.method) {
         case 'eth_accounts':
@@ -84,7 +79,12 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = (await this.wallet.sendTransaction(request.params[0])).hash;
+          if (request.params[0].gas) {
+            request.params[0].gasLimit = request.params[0].gas;
+            delete request.params[0].gas;
+          }
+          tx = await this.wallet.populateTransaction(request.params[0]);
+          result = (await this.wallet.sendTransaction(tx)).hash;
           break;
         case 'eth_signTransaction':
           if (request.params[0]?.from.toLowerCase() !== address.toLowerCase()) {
@@ -92,7 +92,12 @@ export class EIP155SignerConnection implements IBlockchainSignerConnection {
               `Method ${request.method} targetted incorrect account: ${address}`
             );
           }
-          result = await this.wallet.signTransaction(request.params[0]);
+          if (request.params[0].gas) {
+            request.params[0].gasLimit = request.params[0].gas;
+            delete request.params[0].gas;
+          }
+          tx = await this.wallet.populateTransaction(request.params[0]);
+          result = await this.wallet.signTransaction(tx);
           break;
         case 'eth_sign':
           if (request.params[0].toLowerCase() !== address.toLowerCase()) {
